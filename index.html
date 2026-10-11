@@ -3,132 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Parlamentar 2026</title>
+  <title>Simulador Eleitoral 2026</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background-color: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .card { background: #ffffff; width: 100%; max-width: 500px; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; text-align: center; margin-bottom: 4px; }
+    h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
+    p.desc { font-size: 13px; color: #475569; line-height: 1.4; margin-bottom: 16px; }
     
-    .card { background: #ffffff; width: 100%; max-width: 520px; border-radius: 18px; padding: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-    h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; text-align: center; }
-    h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
-    p.sub { font-size: 13px; color: #475569; line-height: 1.45; margin-bottom: 16px; }
-
-    /* Lista de Temas */
-    .theme-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-    .theme-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    .theme-btn.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
-
-    /* Botão Principal */
-    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; }
-    .btn-main:active { background: #172554; }
-
-    /* Barra de Progresso */
-    .progress-bar-bg { width: 100%; background: #e2e8f0; height: 8px; border-radius: 999px; overflow: hidden; margin: 8px 0 16px; }
-    .progress-bar-fill { background: #1e3a8a; height: 100%; width: 10%; transition: width 0.3s ease; }
-
-    /* Questão */
-    .badge-tag { display: inline-block; background: #dbeafe; color: #1e3a8a; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; }
-    .q-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
-    .q-box { background: #f8fafc; border-left: 3px solid #1e3a8a; padding: 12px; border-radius: 8px; font-size: 13px; color: #334155; line-height: 1.5; margin-bottom: 16px; }
-
-    /* Votos Sim / Não */
-    .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; }
-    .vote-sim { background: #f0fdf4; border-color: #86efac; color: #166534; }
-    .vote-sim.active { background: #22c55e; border-color: #22c55e; color: #ffffff; }
-    .vote-nao { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
-    .vote-nao.active { background: #ef4444; border-color: #ef4444; color: #ffffff; }
-
-    /* Navegação */
-    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
-    .btn-prev { background: transparent; border: none; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; padding: 8px; }
-
-    /* Resultados */
-    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-    .res-card { padding: 14px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; background: #f8fafc; }
-    .res-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
-    .res-val { font-size: 32px; font-weight: 900; line-height: 1; margin: 6px 0; }
-    .res-sub { font-size: 11px; color: #64748b; font-weight: 600; }
-
-    .audit-box { max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 16px; text-align: left; }
-    .audit-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
-    .audit-item:last-child { border-bottom: none; }
-    .audit-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 4px; }
-    .audit-details { font-size: 11px; color: #475569; background: #f8fafc; padding: 6px; border-radius: 6px; margin-top: 4px; }
-
-    .btn-sec { background: #ffffff; border: 1px solid #cbd5e1; color: #1e3a8a; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; text-align: center; }
+    .opt-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 8px; font-size: 14px; font-weight: bold; width: 100%; text-align: left; cursor: pointer; display: flex; justify-content: space-between; }
+    .opt-btn.sel { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
+    
+    .btn-action { background: #1e3a8a; color: #ffffff; border: none; border-radius: 10px; padding: 14px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; text-align: center; margin-top: 8px; }
+    
+    .box-q { background: #f8fafc; border-left: 4px solid #1e3a8a; padding: 12px; border-radius: 8px; font-size: 13px; margin: 12px 0; line-height: 1.4; }
+    .vote-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .btn-v { flex: 1; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-weight: bold; font-size: 14px; cursor: pointer; background: #ffffff; }
+    .btn-v.v-sim { background: #22c55e; border-color: #22c55e; color: #ffffff; }
+    .btn-v.v-nao { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+    
+    .res-box { display: flex; gap: 10px; margin-bottom: 16px; }
+    .res-col { flex: 1; padding: 14px; border-radius: 10px; text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .res-num { font-size: 30px; font-weight: 900; margin: 6px 0; }
+    .hist-item { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 12px; text-align: left; }
   </style>
 </head>
 <body>
 
-  <!-- TELA 1: Escolha do Tema -->
-  <div id="viewStart" class="card">
+  <!-- ECRÃ 1 -->
+  <div id="scr1" class="card">
     <h1>Simulador Parlamentar</h1>
-    <p class="sub" style="text-align: center; margin-bottom: 18px;">Eleições 2026 • Segundo Turno</p>
-
-    <h2>Escolha a sua Prioridade</h2>
-    <p class="sub">Toque em uma das 5 áreas para simular o seu voto em 10 projetos reais do Congresso e comparar com os atos de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
-
-    <div class="theme-list">
-      <button type="button" class="theme-btn" onclick="selectTheme('Educacao', this)">
-        <span>📚 Educação</span><span class="chk"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="selectTheme('Saude', this)">
-        <span>🩺 Saúde</span><span class="chk"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="selectTheme('Seguranca', this)">
-        <span>🛡️ Segurança Pública</span><span class="chk"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="selectTheme('Economia', this)">
-        <span>📈 Economia & Tributos</span><span class="chk"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="selectTheme('Emprego', this)">
-        <span>💼 Emprego & Trabalho</span><span class="chk"></span>
-      </button>
-    </div>
-
-    <button type="button" id="btnStartQuiz" class="btn-main" onclick="startQuiz()">
-      Selecione um tema acima
-    </button>
+    <p class="desc" style="text-align: center; margin-bottom: 14px;">Eleições 2026 • Segundo Turno</p>
+    <h2>Selecione uma Área</h2>
+    <p class="desc">Escolha um eixo para simular 10 votações e comparar a sua afinidade com <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
+    
+    <button type="button" class="opt-btn" onclick="escolherTema(0, this)"><span>📚 Educação</span><span class="m"></span></button>
+    <button type="button" class="opt-btn" onclick="escolherTema(1, this)"><span>🩺 Saúde</span><span class="m"></span></button>
+    <button type="button" class="opt-btn" onclick="escolherTema(2, this)"><span>🛡️ Segurança Pública</span><span class="m"></span></button>
+    <button type="button" class="opt-btn" onclick="escolherTema(3, this)"><span>📈 Economia</span><span class="m"></span></button>
+    <button type="button" class="opt-btn" onclick="escolherTema(4, this)"><span>💼 Emprego</span><span class="m"></span></button>
+    
+    <button type="button" id="btnAvancar" class="btn-action" onclick="iniciar()">Escolha um tema acima</button>
   </div>
 
-  <!-- TELA 2: Votação -->
-  <div id="viewQuiz" class="card" style="display: none;">
-    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #64748b;">
-      <span id="lblArea">Tema</span>
-      <span id="lblStep">Questão 1 de 10</span>
+  <!-- ECRÃ 2 -->
+  <div id="scr2" class="card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; font-weight: bold;">
+      <span id="txtArea">Área</span>
+      <span id="txtPasso">1 de 10</span>
     </div>
-    <div class="progress-bar-bg">
-      <div id="fillBar" class="progress-bar-fill"></div>
+    <div style="font-size: 11px; font-weight: bold; color: #1e3a8a; margin-top: 10px;" id="txtNum">PROPOSTA #1</div>
+    <div style="font-size: 15px; font-weight: bold; margin: 4px 0;" id="txtTitulo">Título</div>
+    <div class="box-q" id="txtDesc">Descrição</div>
+    
+    <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">O seu voto como parlamentar:</div>
+    <div class="vote-row">
+      <button type="button" id="bSim" class="btn-v" onclick="votar(true)">SIM (Aprovar)</button>
+      <button type="button" id="bNao" class="btn-v" onclick="votar(false)">NÃO (Rejeitar)</button>
     </div>
-
-    <div class="badge-tag" id="lblTag">PROPOSIÇÃO #1</div>
-    <div class="q-title" id="lblTitle">Título do Projeto</div>
-    <div class="q-box" id="lblDesc">Descrição do projeto...</div>
-
-    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como você votaria nesta matéria?</div>
-    <div class="vote-grid">
-      <button type="button" id="btnSim" class="vote-btn vote-sim" onclick="vote(true)">SIM (Aprovar)</button>
-      <button type="button" id="btnNao" class="vote-btn vote-nao" onclick="vote(false)">NÃO (Rejeitar)</button>
-    </div>
-
-    <div class="nav-row">
-      <button type="button" id="btnBack" class="btn-prev" onclick="goBack()">← Anterior</button>
-      <button type="button" id="btnNext" class="btn-main" style="width: auto; padding: 10px 22px; font-size: 13px;" onclick="goNext()">Confirmar</button>
+    
+    <div style="display: flex; justify-content: space-between;">
+      <button type="button" id="bVoltar" style="background: none; border: none; font-weight: bold; color: #64748b; cursor: pointer;" onclick="voltar()">← Anterior</button>
+      <button type="button" id="bConf" class="btn-action" style="width: auto; padding: 10px 20px; margin: 0;" onclick="avancarQuestao()">Avançar</button>
     </div>
   </div>
 
-  <!-- TELA 3: Resultados -->
-  <div id="viewResult" class="card" style="display: none; text-align: center;">
-    <h2>Resultado da Afinidade</h2>
-    <p class="sub">Confronto direto com os atos e votos dos candidatos:</p>
-
-    <div class="res-grid">
-      <div class="res-card" style="border-top: 4px solid #ef4444;">
-        <div class="res-name" style="color: #b91c1c;">Lula (PT)</div>
-        <div id="valLula" class="res-val" style="color: #ef4444;">0%</div>
-        <div class="res-sub" id="countLula">0 de 10 alinhamentos</div>
+  <!-- ECRÃ 3 -->
+  <div id="scr3" class="card" style="display: none; text-align: center;">
+    <h2>Resultado de Afinidade</h2>
+    <p class="desc">Confronto com os atos reais dos candidatos:</p>
+    
+    <div class="res-box">
+      <div class="res-col" style="border-top: 4px solid #ef4444;">
+        <div style="font-size: 13px; font-weight: bold; color: #b91c1c;">Lula (PT)</div>
+        <div id="resL" class="res-num" style="color: #ef4444;">0%</div>
+        <div style="font-size: 11px; color: #64748b;" id="totL">0 de 10</div>
       </div>
-      <div class="res-card" style="border-top: 4px solid #3b82f6;">
-        <div class="res-name" style="color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
-        <div
+      <div class="res-col" style="border-top: 4px solid #3b82f6;">
+        <div style="font-size: 13px; font-weight: bold; color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
+        <div id="resF" class="res-num" style="color: #3b82f6;">0%</div>
+        <div style="font-size: 11px; color: #64748b;" id="totF">0 de 10</div>
+      </div>
+    </div>
+    
+    <div style="font-size: 12px; font-weight: bold; text-align: left; margin-bottom: 6px;">Histórico de Votos:</div>
+    <div id="listaAuditoria" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px;"></div>
+    
+    <button type="button" class="btn-action" onclick="copiar()">Copiar Resumo</button>
+    <button type="button" style="background: none; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer;" onclick="reiniciar()">Escolher Outro Eixo</button>
+  </div>
+
+  <script>
+    var temas = ["Educação", "Saúde", "Segurança Pública", "Economia", "Emprego"];
+    
+    // Base de dados estruturada: [id, titulo, descricao, votoLula, votoFlavio]
+    var dados = [
+      // 0: Educação
+      [
+        [1, "Reformulação do Ensino Médio", "Fixar 2.400 horas para a base comum, reduzindo a parte flexível dos itinerários formativos.", true, false],
+        [2, "Poupança Escolar (Pé-de-Meia)", "Criar bolsa financeira e poupança federal para estudantes do ensino médio público.", true, false],
+        [3, "Regulamentação do Homeschooling", "Autorizar a educação domiciliar formal sob supervisão e avaliações periódicas.", false, true],
+        [4, "Escolas Cívico-Militares", "Manter financiamento federal ao programa conjunto com corporações de segurança.", false, true],
+        [5, "Atualização da Lei de Cotas", "Renovar cotas com teto socioeconómico de 1 salário mínimo per capita e incluir pós-graduação.", true, false],
+        [6, "Mensalidade em Pós-graduação Pública", "Permitir cobrança de mensalidades em especializações em universidades públicas federais.", false, true],
+        [7, "Fundeb para Instituições Conveniadas", "Autorizar repasse do Fundeb a escolas confessionais e comunitárias particulares.", false, true],
+        [8, "Escola em Tempo Integral", "Repasse federal vinculado a estados para ampliar a jornada para 7 horas diárias.", true, false],
+        [9, "Royalties do Petróleo para Educação", "Manter vinculação obrigatória de receitas do petróleo exclusivamente ao setor educacional.", true, false],
+        [10, "Bolsas em Escolas Privadas (Vouchers)", "Conceder subsídios para matrículas particulares em vez de erguer novos edifícios públicos.", false, true]
+      ],
+      // 1: Saúde
+      [
+        [11, "Dispensa de Revalida Provisória", "Permitir formados no exterior em áreas prioritárias sem revalidação imediata do diploma.", true, false],
+        [12, "Licença Compulsória em Emergências", "Quebra temporária facilitada de patentes de fármacos durante crises sanitárias.", true, false],
+        [13, "Exigência de Vacinação Infantil", "Manter vacinação básica obrigatória como critério para apoios sociais e matrículas.", true, false],
+        [14, "Fornecimento de Canabidiol pelo SUS", "Autorizar medicamentos derivados de cannabis para tratamentos neurológicos na rede pública.", true, false],
+        [15, "Gestão Hospitalar por Organizações Sociais", "Transferir a gestão de hospitais públicos para fundações e entidades privadas.", false, true],
+        [16, "Vedação de Rescisão de Planos de Saúde", "Proibir operadoras privadas de cancelar unilateralmente planos de pacientes crónicos e idosos.", true, false],
+        [17, "Piso da Saúde Livre de Teto Fiscal", "Proibir travas orçamentárias que limitem os repasses federais mínimos para a saúde pública.", true, false],
+        [18, "Telessaúde Sem Consulta Presencial Prévia", "Autorizar consultas e prescrições médicas à distância em todo o território nacional.", true, true],
+        [19, "Dedução Total de Saúde no Imposto de Renda", "Manter a possibilidade de dedução integral dos custos de hospitais privados na declaração.", false, true],
+        [20, "Gratuidade Integral no Farmácia Popular", "Financiamento público total de medicamentos para asma e hipertensão em farmácias conveniadas.", true, false]
+      ],
+      // 2: Segurança
+      [
+        [21, "Extinção de Saídas Temporárias", "Acabar com o benefício de saída de reclusos em regime semiaberto em feriados.", false, true],
+        [22, "Facilitação de Armas e Munições para CACs", "Permitir transporte com munição pronta para uso a atiradores desportivos registados.", false, true],
+        [23, "Maioridade Penal aos 16 Anos", "Permitir aplicação de regime prisional comum para maiores de 16 anos em crimes hediondos.", false, true],
+        [24, "Câmaras em Uniformes Policiais", "Condicionar fundos de segurança federais à utilização de câmaras nas fardas policiais.", true, false],
+        [25, "Invasão Rural como Crime Hediondo", "Tipificar ocupações e invasões de terra com pena inafiançável e prisão em flagrante.", false, true],
+        [26, "Vedação de Soltura para Reincidentes", "Impedir liberdade provisória em audiência de custódia para reincidentes em roubo e tráfico.", false, true],
+        [27, "Implementação do Juiz das Garantias", "Criar juiz específico para a instrução, proibindo-o de julgar o mérito da ação penal.", true, true],
+        [28, "Descriminalização de Pequenas Quantidades", "Definir porte individual de canábis (até 40g) sem sanções de natureza penal.", true, false],
+        [29, "Pena Prisional Contínua de até 40 Anos", "Manter a ampliação do tempo máximo de cumprimento ininterrupto de reclusão.", false, true],
+        [30, "Limitações a Incursões Armadas", "Restringir operações ostensivas armadas em áreas escolares e hospitalares em serviço.", true, false]
+      ],
+      // 3: Economia
+      [
+        [31, "Autonomia do Banco Central", "Fixar mandatos não coincidentes para a direção do Banco Central definir taxas de juro.", false, true],
+        [32, "Privatização de Grandes Estatais", "Alienação de participações governamentais em companhias de geração elétrica e infraestrutura.", false, true],
+        [33, "Tributação sobre Fundos Exclusivos", "Cobrança periódica de tributos sobre carteiras e contas internacionais de alta renda.", true, false],
+        [34, "Regime do Arcabouço Fiscal", "Permitir expansão de despesas federais atreladas ao comportamento da receita arrecadada.", true, false],
+
+        
