@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Parlamentar - Segundo Turno Presidencial</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+body { background-color: #f1f5f9; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; }
+header { background: #ffffff; border-bottom: 1px solid #cbd5e1; padding: 14px 16px; position: sticky; top: 0; z-index: 10; }
+.header-box { max-width: 600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.brand { font-weight: 800; font-size: 17px; color: #1e3a8a; }
+.badge { font-size: 12px; background: #e2e8f0; padding: 4px 10px; border-radius: 999px; font-weight: 600; color: #475569; }
+
+main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
+.card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 26px; width: 100%; max-width: 600px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+
+h2 { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 6px; line-height: 1.3; }
+p.desc { font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px; }
+
+.banner-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+.banner-btn { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; font-size: 15px; font-weight: 700; color: #1e293b; }
+.banner-btn:hover { border-color: #1e3a8a; background: #eff6ff; }
+.banner-btn.selected { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
+
+.btn-action { width: 100%; background: #1e3a8a; color: #ffffff; border: none; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.btn-action:hover { background: #172554; }
+.btn-action:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
+
+.progress-track { width: 100%; background: #e2e8f0; height: 8px; border-radius: 999px; overflow: hidden; margin: 10px 0 18px; }
+.progress-fill { background: #1e3a8a; height: 100%; width: 10%; transition: width 0.3s ease; }
+
+.tag { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #1e3a8a; background: #dbeafe; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; }
+.project-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+.project-text { font-size: 13px; color: #334155; line-height: 1.55; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 10px; border-left: 3px solid #1e3a8a; }
+
+.vote-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.btn-vote { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 700; border: 2px solid transparent; cursor: pointer; transition: 0.2s; text-align: center; }
+.btn-yes { background: #f0fdf4; border-color: #86efac; color: #166534; }
+.btn-yes:hover, .btn-yes.active { background: #22c55e; border-color: #22c55e; color: #ffffff; }
+.btn-no { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+.btn-no:hover, .btn-no.active { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+
+.nav-bar { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+.btn-back { background: none; border: none; color: #64748b; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-back:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Resultados */
+.affinity-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.affinity-card { padding: 16px; border-radius: 14px; text-align: center; border: 1px solid #e2e8f0; background: #f8fafc; }
+.affinity-card h4 { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+.affinity-val { font-size: 32px; font-weight: 900; line-height: 1; margin: 8px 0; }
+.affinity-sub { font-size: 11px; color: #64748b; font-weight: 600; }
+
+.table-box { max-height: 280px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 18px; text-align: left; }
+.vote-item { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+.vote-item:last-child { border-bottom: none; }
+.item-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 4px; }
+.badge-sim { color: #166534; font-weight: 700; }
+.badge-nao { color: #991b1b; font-weight: 700; }
+.acts-info { color: #475569; font-size: 11px; line-height: 1.4; margin-top: 4px; background: #f8fafc; padding: 6px; border-radius: 6px; }
+
+.btn-outline { width: 100%; background: #ffffff; border: 1px solid #cbd5e1; color: #1e3a8a; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.btn-outline:hover { background: #f8fafc; }
+</style>
+</head>
+<body>
+
+<header>
+<div class="header-box">
+<div class="brand">Simulador Eleitoral 2026</div>
+<div id="badgeCount" class="badge" style="display: none;">1 de 10</div>
+</div>
+</header>
+
+<main>
+<!-- TELA 1: Escolha da Bandeira -->
+<div id="screenStart" class="card">
+<h2>Escolha a sua Prioridade</h2>
+<p class="desc">Selecione uma das 5 áreas para simular votações de 10 projetos reais debatidos no Congresso e comparar diretamente com a atuação parlamentar de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
+
+<div class="banner-grid">
+<button class="banner-btn" onclick="selectBanner('Educacao', this)">
+<span>📚 Educação</span><span>➔</span>
+</button>
+<button class="banner-btn" onclick="selectBanner('Saude', this)">
+<span>🩺 Saúde</span><span>➔</span>
+</button>
+<button class="banner-btn" onclick="selectBanner('Seguranca', this)">
+<span>🛡️ Segurança Pública</span><span>➔</span>
+</button>
+<button class="banner-btn" onclick="selectBanner('Economia', this)">
+<span>📈 Economia & Tributos</span><span>➔</span>
+</button>
+<button class="banner-btn" onclick="selectBanner('Emprego', this)">
+<span>💼 Emprego & Relações de Trabalho</span><span>➔</span>
+</button>
+</div>
+
+<button id="btnStart" class="btn-action" onclick="initQuiz()" disabled>Iniciar Simulação</button>
+</div>
+
+<!-- TELA 2: Simulação Parlamentar (Quiz) -->
+<div id="screenQuiz" class="card" style="display: none;">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; font-weight: 600;">
+<span id="txtBannerName">ÁREA</span>
+<span id="txtProgress">10%</span>
+</div>
+<div class="progress-track">
+<div id="fillProgress" class="progress-fill"></div>
+</div>
+
+<div class="tag" id="txtTopic">PROPOSIÇÃO</div>
+<div class="project-title" id="txtTitle">Título da Matéria</div>
+<div class="project-text" id="txtDesc">Descrição resumida do dilema legislativo...</div>
+
+<div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como você votaria nesta proposta?</div>
+<div class="vote-btns">
+<button id="btnVoteYes" class="btn-vote btn-yes" onclick="vote(true)">Votar SIM (Aprovar)</button>
+<button id="btnVoteNo" class="btn-vote btn-no" onclick="vote(false)">Votar NÃO (Rejeitar)</button>
+</div>
+
+<div class="nav-bar">
+<button id="btnBack" class="btn-back" onclick="goPrev()" disabled>Anterior</button>
+<button id="btnNext" class="btn-action" style="width: auto; padding: 10px 22px; font-size: 13px;" onclick="goNext()" disabled>Confirmar Voto</button>
+</div>
+</div>
+
+<!-- TELA 3: Resultados e Comparativo de Atos -->
+<div id="screenResult" class="card" style="display: none; text-align: center;">
+<h2>Resultado da Afinidade Legislativa</h2>
+<p class="desc" style="margin-bottom: 16px;">Confronto das suas decisões com os registros de votação e atos dos dois candidatos:</p>
+
+<div class="affinity-container">
+<div class="affinity-card" style="border-top: 4px solid #ef4444;">
+<h4 style="color: #b91c1c;">Lula (PT)</h4>
+<div id="valLula" class="affinity-val" style="color: #ef4444;">0%</div>
+<div class="affinity-sub" id="matchesLula">0 de 10 alinhamentos</div>
+</div>
+<div class="affinity-card" style="border-top: 4px solid #3b82f6;">
+<h4 style="color: #1d4ed8;">Flávio Bolsonaro (PL)</h4>
+<div id="valFlavio" class="affinity-val" style="color: #3b82f6;">0%</div>
+<div class="affinity-sub" id="matchesFlavio">0 de 10 alinhamentos</div>
+</div>
+</div>
+
+<div style="font-size: 12px; font-weight: 700; color: #334155; text-align: left; margin-bottom: 6px;">Auditoria das Votações:</div>
+<div id="tableHistory" class="table-box"></div>
+
+<button class="btn-action" onclick="copyResults()">Copiar Resumo da Análise</button>
+<button class="btn-outline" onclick="resetToStart()">Testar Outra Área</button>
+</div>
+</main>
+
+<script>
+// Banco com 10 projetos reais para cada uma das 5 áreas
+// lulaVote e flavioVote refletem os votos formais ou atos de governo/bancada no Congresso
+const database = {
+Educacao: [
+{ id: 1, title: "Reformulação do Ensino Médio (Lei 14.945/2024)", desc: "Fixar 2.400 horas obrigatórias para disciplinas de formação geral básica, reduzindo o espaço de escolha dos itinerários formativos optativos.", lulaVote: true, flavioVote: false },
+{ id: 2, title: "Programa Pé-de-Meia (Lei 14.818/2024)", desc: "Criar poupança e bolsa financeira mensal do governo federal para estudantes do ensino médio público como incentivo contra a evasão.", lulaVote: true, flavioVote: false },
+{ id: 3, title: "Regulamentação do Homeschooling (PL 3.179/2012)", desc: "Permitir a educação domiciliar formal sob responsabilidade dos pais com avaliações periódicas pelo Estado.", lulaVote: false, flavioVote: true },
+{ id: 4, title: "Escolas Cívico-Militares", desc: "Manter e expandir recursos federais para o modelo de gestão compartilhada entre secretarias de educação e forças de segurança.", lulaVote: false, flavioVote: true },
+{ id: 5, title: "Atualização da Lei de Cotas (Lei 14.723/2023)", desc: "Renovar cotas em universidades públicas incluindo pós-graduação e reduzindo o corte socioeconômico para 1 salário mínimo per capita.", lulaVote: true, flavioVote: false },
+{ id: 6, title: "Cobrança de Mensalidade em Pós-graduação Pública", desc: "Autorizar universidades federais a cobrarem mensalidades em cursos de especialização (lato sensu) para financiar pesquisas.", lulaVote: false, flavioVote: true },
+{ id: 7, title: "Recursos do Fundeb para Escolas Conveniadas Privadas", desc: "Permitir o repasse de recursos públicos do Fundeb para instituições filantrópicas e confessionais no ensino fundamental e médio.", lulaVote: false, flavioVote: true },
+{ id: 8, title: "Pacto Nacional pela Educação em Tempo Integral", desc: "Destinar transferências federais vinculadas para estados expandirem a jornada escolar para 7 horas diárias.", lulaVote: true, flavioVote: false },
+{ id: 9, title: "Vinculação dos Royalties do Petróleo à Educação", desc: "Manter a reserva obrigatória de 75% dos royalties do petróleo e do Fundo Social do Pré-Sal exclusivamente para a educação pública.", lulaVote: true, flavioVote: false },
+{ id: 10, title: "Sistema de Vouchers para Ensino Básico", desc: "Substituir ampliação de prédios públicos por bolsas diretas para famílias matricularem estudantes em colégios particulares conveniados.", lulaVote: false, flavioVote: true }
+ ],
+Saude: [
+{ id: 11, title: "Dispensa de Revalida no Mais Médicos (Lei 14.621/2023)", desc: "Permitir atuação de médicos formados no exterior em cidades vulneráveis por até 4 anos sem exigência inicial de revalidação de diploma.", lulaVote: true, flavioVote: false },
+{ id: 12, title: "Quebra de Patentes em Emergências (PL 12/2021)", desc: "Facilitar o licenciamento compulsório de insumos e medicamentos essenciais quando houver declaração de emergência de saúde pública.", lulaVote: true, flavioVote: false },
+{ id: 13, title: "Obrigatoriedade Vacinal no PNI Infantil", desc: "Manter a exigência de vacinação obrigatória do calendário básico infantil como requisito para matrículas escolares e benefícios de renda.", lulaVote: true, flavioVote: false },
+{ id: 14, title: "Distribuição de Canabidiol pelo SUS (PL 399/2015)", desc: "Autorizar a produção e dispensação de medicamentos derivados de cannabis para tratamentos neurológicos e crônicos na rede pública.", lulaVote: true, flavioVote: false },
+{ id: 15, title: "Gestão de Hospitais Públicos por Organizações Sociais (OSs)", desc: "Permitir a transferência ampla da gestão e quadro clínico de unidades de saúde estatais para a iniciativa privada e fundações.", lulaVote: false, flavioVote: true },
+{ id: 16, title: "Proibição de Cancelamento Unilateral de Planos de Saúde", desc: "Impedir que operadoras privadas cancelem unilateralmente apólices coletivas de usuários em tratamento contínuo ou com autismo.", lulaVote: true, flavioVote: false },
+{ id: 17, title: "Piso Constitucional sem Limite Fiscal para Saúde", desc: "Proibir qualquer tipo de teto orçamentário que impeça o investimento em saúde de acompanhar integralmente o crescimento da receita corrente.", lulaVote: true, flavioVote: false },
+{ id: 18, title: "Autorização Permanente da Telessaúde Privada (Lei 14.510/2022)", desc: "Liberar atendimentos médicos e receitas à distância em todo o país sem necessidade de consulta presencial prévia.", lulaVote: true, flavioVote: true },
+{ id: 19, title: "Dedução Total de Despesas Médicas no IRPF", desc: "Manter a possibilidade de dedução integral e sem limites de gastos com planos e hospitais privados na declaração do imposto de renda.", lulaVote: false, flavioVote: true },
+{ id: 20, title: "Gratuidade Universal no Farmácia Popular", desc: "Custear 100% de medicamentos para asma, diabetes e hipertensão na rede privada conveniada com verba direta da União.", lulaVote: true, flavioVote: false }
+ ],
+Seguranca: [
+{ id: 21, title: "Fim das Saídas Temporárias de Presos (Lei 14.843/2024)", desc: "Extinguir totalmente o direito a saídas temporárias de presos do regime semiaberto em datas comemorativas familiares.", lulaVote: false, flavioVote: true },
+{ id: 22, title: "Flexibilização do Porte e Calibres para CACs", desc: "Ampliar a quantidade de armas e permitir o transporte com arma municiada para atiradores esportivos e caçadores devidamente registrados.", lulaVote: false, flavioVote: true },
+{ id: 23, title: "Redução da Maioridade Penal para 16 anos (PEC 171/1993)", desc: "Permitir a imputabilidade penal de jovens a partir de 16 anos em casos de crimes hediondos, homicídio qualificado e estupro.", lulaVote: false, flavioVote: true },
+{ id: 24, title: "Câmeras Corporais em Forças Policiais", desc: "Condicionar o repasse de recursos do Fundo Nacional de Segurança Pública ao uso de câmeras operacionais nas fardas de agentes.", lulaVote: true, flavioVote: false },
+{ id: 25, title: "Enquadramento de Invasões Rurais como Crime Hediondo", desc: "Tipificar ocupações e invasões de propriedades privadas como atos análogos a terrorismo ou crime contra a ordem com prisão imediata.", lulaVote: false, flavioVote: true },
+{ id: 26, title: "Vedação de Liberdade Provisória para Reincidentes", desc: "Proibir a concessão de fiança ou soltura em audiência de custódia para indivíduos presos que possuam antecedentes por roubo ou tráfico.", lulaVote: false, flavioVote: true },
+{ id: 27, title: "Instituição do Juiz das Garantias (Pacote Anticrime)", desc: "Criar a figura de um magistrado responsável exclusivamente pela fase de investigação preliminar, impedindo-o de julgar o réu.", lulaVote: true, flavioVote: true },
+{ id: 28, title: "Descriminalização do Porte de Pequena Quantidade de Drogas", desc: "Diferenciar usuário de traficante pela quantidade de maconha (até 40g), eliminando sanções penais de prisão.", lulaVote: true, flavioVote: false },
+{ id: 29, title: "Aumento do Tempo Máximo de Cumprimento de Pena para 40 Anos", desc: "Ampliar o tempo limite contínuo que uma pessoa pode permanecer encarcerada no sistema prisional brasileiro.", lulaVote: false, flavioVote: true },
+{ id: 30, title: "Restrições Judiciais a Operações em Favelas", desc: "Impor restrições a incursões policiais armadas em comunidades próximas a escolas e hospitais durante horários de atendimento.", lulaVote: true, flavioVote: false }
+ ],
+Economia: [
+{ id: 31, title: "Autonomia Formal do Banco Central (LC 179/2021)", desc: "Fixar mandatos não coincidentes para diretores do BC para definir juros sem interferência política do presidente da República eleito.", lulaVote: false, flavioVote: true },
+{ id: 32, title: "Desestatização de Grandes Empresas (Eletrobras)", desc: "Transferir o controle acionário de grandes empresas estatais de infraestrutura para o mercado privado visando atração de capital.", lulaVote: false, flavioVote: true },
+{ id: 33, title: "Tributação sobre Offshores e Fundos Exclusivos (Lei 14.754/2023)", desc: "Cobrar imposto de renda semestral (come-cotas) sobre rendimentos de patrimônios de alta renda sediados no Brasil e no exterior.", lulaVote: true, flavioVote: false },
+{ id: 34, title: "Substituição do Teto por Arcabouço Fiscal (LC 200/2023)", desc: "Permitir que os gastos do governo cresçam anualmente entre 0,6% e 2,5% acima da inflação, atrelados ao ritmo da receita arrecadada.", lulaVote: true, flavioVote: false },
+{ id: 35, title: "Reforma Tributária sobre o Consumo (EC 132/2023)", desc: "Unificar cinco impostos em um IVA Dual (IBS e CBS) com alíquota padronizada e isenção total para itens da cesta básica nacional.", lulaVote: true, flavioVote: false },
+{ id: 36, title: "Paridade Internacional de Combustíveis (PPI na Petrobras)", desc: "Obrigar a Petrobras a calcular o preço interno de gasolina e diesel exatamente pela cotação do barril de petróleo em dólares e frete.", lulaVote: false, flavioVote: true },
+{ id: 37, title: "Marco Legal do Saneamento Básico (Lei 14.026/2020)", desc: "Obrigar abertura de concorrência com empresas privadas para contratos de distribuição de água e tratamento de esgoto nas cidades.", lulaVote: false, flavioVote: true },
+{ id: 38, title: "Tributação sobre Plataformas de Apostas e Bets", desc: "Regulamentar e cobrar tributos de 12% sobre o faturamento de casas de apostas online, destinando fatia para esporte e seguridade.", lulaVote: true, flavioVote: true },
+{ id: 39, title: "Crédito Subsidiado por Bancos Públicos para Indústria", desc: "Utilizar recursos do Tesouro Nacional para oferecer taxas de financiamento mais baratas no BNDES para projetos industriais selecionados.", lulaVote: true, flavioVote: false },
+{ id: 40, title: "Privatização dos Correios (PL 591/2021)", desc: "Permitir a alienação total da Empresa Brasileira de Correios e Telégrafos e abertura do mercado postal nacional à iniciativa privada.", lulaVote: false, flavioVote: true }
+ ],
+Emprego: [
+{ id: 41, title: "Prevalência do Acordo Individual sobre a CLT (Lei 13.467/2017)", desc: "
