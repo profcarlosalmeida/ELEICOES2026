@@ -3,311 +3,358 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Eleitoral 2026</title>
+  <title>Simulador Parlamentar 2026</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background-color: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .card { background: #ffffff; width: 100%; max-width: 500px; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; text-align: center; margin-bottom: 4px; }
-    h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: #0f172a; }
-    p.desc { font-size: 13px; color: #475569; line-height: 1.4; margin-bottom: 16px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
-    .opt-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 8px; font-size: 14px; font-weight: bold; width: 100%; text-align: left; cursor: pointer; display: flex; justify-content: space-between; }
-    .opt-btn.sel { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
-    
-    .btn-action { background: #1e3a8a; color: #ffffff; border: none; border-radius: 10px; padding: 14px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; text-align: center; margin-top: 8px; }
-    
-    .box-q { background: #f8fafc; border-left: 4px solid #1e3a8a; padding: 12px; border-radius: 8px; font-size: 13px; margin: 12px 0; line-height: 1.4; }
-    .vote-row { display: flex; gap: 10px; margin-bottom: 14px; }
-    .btn-v { flex: 1; padding: 14px; border-radius: 10px; border: 2px solid #cbd5e1; font-weight: bold; font-size: 14px; cursor: pointer; background: #ffffff; }
-    .btn-v.v-sim { background: #22c55e; border-color: #22c55e; color: #ffffff; }
-    .btn-v.v-nao { background: #ef4444; border-color: #ef4444; color: #ffffff; }
-    
-    .res-box { display: flex; gap: 10px; margin-bottom: 16px; }
-    .res-col { flex: 1; padding: 14px; border-radius: 10px; text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; }
-    .res-num { font-size: 30px; font-weight: 900; margin: 6px 0; }
-    .hist-item { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 12px; text-align: left; }
+    .card { background: #ffffff; width: 100%; max-width: 520px; border-radius: 18px; padding: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+    h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; text-align: center; }
+    h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    p.sub { font-size: 13px; color: #475569; line-height: 1.45; margin-bottom: 16px; }
+
+    /* Lista de Temas */
+    .theme-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .theme-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .theme-btn.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
+
+    /* Botão Principal */
+    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; }
+    .btn-main:active { background: #172554; }
+
+    /* Barra de Progresso */
+    .progress-bar-bg { width: 100%; background: #e2e8f0; height: 8px; border-radius: 999px; overflow: hidden; margin: 8px 0 16px; }
+    .progress-bar-fill { background: #1e3a8a; height: 100%; width: 10%; transition: width 0.3s ease; }
+
+    /* Questão */
+    .badge-tag { display: inline-block; background: #dbeafe; color: #1e3a8a; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; text-transform: uppercase; }
+    .q-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .q-box { background: #f8fafc; border-left: 3px solid #1e3a8a; padding: 12px; border-radius: 8px; font-size: 13px; color: #334155; line-height: 1.5; margin-bottom: 16px; }
+
+    /* Votos Sim / Não */
+    .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; }
+    .vote-sim { background: #f0fdf4; border-color: #86efac; color: #166534; }
+    .vote-sim.active { background: #22c55e; border-color: #22c55e; color: #ffffff; }
+    .vote-nao { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+    .vote-nao.active { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+
+    /* Navegação */
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+    .btn-prev { background: transparent; border: none; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; padding: 8px; }
+
+    /* Resultados */
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    .res-card { padding: 14px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; background: #f8fafc; }
+    .res-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+    .res-val { font-size: 32px; font-weight: 900; line-height: 1; margin: 6px 0; }
+    .res-sub { font-size: 11px; color: #64748b; font-weight: 600; }
+
+    .audit-box { max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 16px; text-align: left; }
+    .audit-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .audit-item:last-child { border-bottom: none; }
+    .audit-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 4px; }
+    .audit-details { font-size: 11px; color: #475569; background: #f8fafc; padding: 6px; border-radius: 6px; margin-top: 4px; }
+
+    .btn-sec { background: #ffffff; border: 1px solid #cbd5e1; color: #1e3a8a; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- ECRÃ 1 -->
-  <div id="scr1" class="card">
+  <!-- TELA 1: Escolha do Tema -->
+  <div id="viewStart" class="card">
     <h1>Simulador Parlamentar</h1>
-    <p class="desc" style="text-align: center; margin-bottom: 14px;">Eleições 2026 • Segundo Turno</p>
-    <h2>Selecione uma Área</h2>
-    <p class="desc">Escolha um eixo para simular 10 votações e comparar a sua afinidade com <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
-    
-    <button type="button" class="opt-btn" onclick="escolherTema(0, this)"><span>📚 Educação</span><span class="m"></span></button>
-    <button type="button" class="opt-btn" onclick="escolherTema(1, this)"><span>🩺 Saúde</span><span class="m"></span></button>
-    <button type="button" class="opt-btn" onclick="escolherTema(2, this)"><span>🛡️ Segurança Pública</span><span class="m"></span></button>
-    <button type="button" class="opt-btn" onclick="escolherTema(3, this)"><span>📈 Economia</span><span class="m"></span></button>
-    <button type="button" class="opt-btn" onclick="escolherTema(4, this)"><span>💼 Emprego</span><span class="m"></span></button>
-    
-    <button type="button" id="btnAvancar" class="btn-action" onclick="iniciar()">Escolha um tema acima</button>
+    <p class="sub" style="text-align: center; margin-bottom: 18px;">Eleições 2026 • Segundo Turno</p>
+
+    <h2>Escolha a sua Prioridade</h2>
+    <p class="sub">Toque em uma das 5 áreas para simular o seu voto em 10 projetos reais do Congresso e comparar com os atos de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
+
+    <div class="theme-list">
+      <button type="button" class="theme-btn" onclick="selectTheme('Educacao', this)">
+        <span>📚 Educação</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Saude', this)">
+        <span>🩺 Saúde</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Seguranca', this)">
+        <span>🛡️ Segurança Pública</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Economia', this)">
+        <span>📈 Economia & Tributos</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Emprego', this)">
+        <span>💼 Emprego & Trabalho</span><span class="chk"></span>
+      </button>
+    </div>
+
+    <button type="button" id="btnStartQuiz" class="btn-main" onclick="startQuiz()">
+      Selecione um tema acima
+    </button>
   </div>
 
-  <!-- ECRÃ 2 -->
-  <div id="scr2" class="card" style="display: none;">
-    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; font-weight: bold;">
-      <span id="txtArea">Área</span>
-      <span id="txtPasso">1 de 10</span>
+  <!-- TELA 2: Votação -->
+  <div id="viewQuiz" class="card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #64748b;">
+      <span id="lblArea">Tema</span>
+      <span id="lblStep">Questão 1 de 10</span>
     </div>
-    <div style="font-size: 11px; font-weight: bold; color: #1e3a8a; margin-top: 10px;" id="txtNum">PROPOSTA #1</div>
-    <div style="font-size: 15px; font-weight: bold; margin: 4px 0;" id="txtTitulo">Título</div>
-    <div class="box-q" id="txtDesc">Descrição</div>
-    
-    <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">O seu voto como parlamentar:</div>
-    <div class="vote-row">
-      <button type="button" id="bSim" class="btn-v" onclick="votar(true)">SIM (Aprovar)</button>
-      <button type="button" id="bNao" class="btn-v" onclick="votar(false)">NÃO (Rejeitar)</button>
+    <div class="progress-bar-bg">
+      <div id="fillBar" class="progress-bar-fill"></div>
     </div>
-    
-    <div style="display: flex; justify-content: space-between;">
-      <button type="button" id="bVoltar" style="background: none; border: none; font-weight: bold; color: #64748b; cursor: pointer;" onclick="voltar()">← Anterior</button>
-      <button type="button" id="bConf" class="btn-action" style="width: auto; padding: 10px 20px; margin: 0;" onclick="avancarQuestao()">Avançar</button>
+
+    <div class="badge-tag" id="lblTag">PROPOSIÇÃO #1</div>
+    <div class="q-title" id="lblTitle">Título do Projeto</div>
+    <div class="q-box" id="lblDesc">Descrição do projeto...</div>
+
+    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como você votaria nesta matéria?</div>
+    <div class="vote-grid">
+      <button type="button" id="btnSim" class="vote-btn vote-sim" onclick="vote(true)">SIM (Aprovar)</button>
+      <button type="button" id="btnNao" class="vote-btn vote-nao" onclick="vote(false)">NÃO (Rejeitar)</button>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" id="btnBack" class="btn-prev" onclick="goBack()">← Anterior</button>
+      <button type="button" id="btnNext" class="btn-main" style="width: auto; padding: 10px 22px; font-size: 13px;" onclick="goNext()">Confirmar</button>
     </div>
   </div>
 
-  <!-- ECRÃ 3 -->
-  <div id="scr3" class="card" style="display: none; text-align: center;">
-    <h2>Resultado de Afinidade</h2>
-    <p class="desc">Confronto com os atos reais dos candidatos:</p>
-    
-    <div class="res-box">
-      <div class="res-col" style="border-top: 4px solid #ef4444;">
-        <div style="font-size: 13px; font-weight: bold; color: #b91c1c;">Lula (PT)</div>
-        <div id="resL" class="res-num" style="color: #ef4444;">0%</div>
-        <div style="font-size: 11px; color: #64748b;" id="totL">0 de 10</div>
+  <!-- TELA 3: Resultados -->
+  <div id="viewResult" class="card" style="display: none; text-align: center;">
+    <h2>Resultado da Afinidade</h2>
+    <p class="sub">Confronto direto com os atos e votos dos candidatos:</p>
+
+    <div class="res-grid">
+      <div class="res-card" style="border-top: 4px solid #ef4444;">
+        <div class="res-name" style="color: #b91c1c;">Lula (PT)</div>
+        <div id="valLula" class="res-val" style="color: #ef4444;">0%</div>
+        <div class="res-sub" id="countLula">0 de 10 alinhamentos</div>
       </div>
-      <div class="res-col" style="border-top: 4px solid #3b82f6;">
-        <div style="font-size: 13px; font-weight: bold; color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
-        <div id="resF" class="res-num" style="color: #3b82f6;">0%</div>
-        <div style="font-size: 11px; color: #64748b;" id="totF">0 de 10</div>
+      <div class="res-card" style="border-top: 4px solid #3b82f6;">
+        <div class="res-name" style="color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
+        <div id="valFlavio" class="res-val" style="color: #3b82f6;">0%</div>
+        <div class="res-sub" id="countFlavio">0 de 10 alinhamentos</div>
       </div>
     </div>
-    
-    <div style="font-size: 12px; font-weight: bold; text-align: left; margin-bottom: 6px;">Histórico de Votos:</div>
-    <div id="listaAuditoria" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px;"></div>
-    
-    <button type="button" class="btn-action" onclick="copiar()">Copiar Resumo</button>
-    <button type="button" style="background: none; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; width: 100%; font-weight: bold; margin-top: 8px; cursor: pointer;" onclick="reiniciar()">Escolher Outro Eixo</button>
+
+    <div style="font-size: 12px; font-weight: 700; color: #334155; text-align: left; margin-bottom: 6px;">Auditoria de Voto por Voto:</div>
+    <div id="auditList" class="audit-box"></div>
+
+    <button type="button" class="btn-main" onclick="shareResults()">Copiar Resumo</button>
+    <button type="button" class="btn-sec" onclick="restart()">Escolher Outra Área</button>
   </div>
 
   <script>
-    var temas = ["Educação", "Saúde", "Segurança Pública", "Economia", "Emprego"];
-    
-    var dados = [
-      // 0: Educação
-      [
-        [1, "Reformulação do Ensino Médio", "Fixar 2.400 horas para a base comum, reduzindo a parte flexível dos itinerários formativos.", true, false],
-        [2, "Poupança Escolar (Pé-de-Meia)", "Criar bolsa financeira e poupança federal para estudantes do ensino médio público.", true, false],
-        [3, "Regulamentação do Homeschooling", "Autorizar a educação domiciliar formal sob supervisão e avaliações periódicas.", false, true],
-        [4, "Escolas Cívico-Militares", "Manter financiamento federal ao programa conjunto com corporações de segurança.", false, true],
-        [5, "Atualização da Lei de Cotas", "Renovar cotas com teto socioeconómico de 1 salário mínimo per capita e incluir pós-graduação.", true, false],
-        [6, "Mensalidade em Pós-graduação Pública", "Permitir cobrança de mensalidades em especializações em universidades públicas federais.", false, true],
-        [7, "Fundeb para Instituições Conveniadas", "Autorizar repasse do Fundeb a escolas confessionais e comunitárias particulares.", false, true],
-        [8, "Escola em Tempo Integral", "Repasse federal vinculado a estados para ampliar a jornada para 7 horas diárias.", true, false],
-        [9, "Royalties do Petróleo para Educação", "Manter vinculação obrigatória de receitas do petróleo exclusivamente ao setor educacional.", true, false],
-        [10, "Bolsas em Escolas Privadas (Vouchers)", "Conceder subsídios para matrículas particulares em vez de erguer novos edifícios públicos.", false, true]
+    var database = {
+      Educacao: [
+        { id: 1, title: "Reformulação do Ensino Médio (Lei 14.945/2024)", desc: "Fixar 2.400 horas obrigatórias para a formação geral básica, reduzindo a carga optativa dos itinerários.", lulaVote: true, flavioVote: false },
+        { id: 2, title: "Programa Pé-de-Meia (Lei 14.818/2024)", desc: "Instituir poupança financeira e bolsa mensal paga pela União a alunos de escolas públicas para reduzir a evasão.", lulaVote: true, flavioVote: false },
+        { id: 3, title: "Educação Domiciliar / Homeschooling (PL 3.179/2012)", desc: "Permitir formalmente o ensino em casa sob a tutela dos pais com avaliações periódicas do Estado.", lulaVote: false, flavioVote: true },
+        { id: 4, title: "Programa de Escolas Cívico-Militares", desc: "Manter verba federal para o modelo compartilhado de gestão disciplinar com forças de segurança pública.", lulaVote: false, flavioVote: true },
+        { id: 5, title: "Atualização da Lei de Cotas (Lei 14.723/2023)", desc: "Prorrogar o sistema de cotas federais com teto socioeconômico reduzido para 1 salário mínimo per capita.", lulaVote: true, flavioVote: false },
+        { id: 6, title: "Cobrança de Mensalidade em Pós-Graduação Pública", desc: "Autorizar universidades federais a cobrarem cursos de especialização (lato sensu) para captar recursos.", lulaVote: false, flavioVote: true },
+        { id: 7, title: "Repasses do Fundeb a Escolas Privadas Conveniadas", desc: "Permitir o direcionamento de recursos públicos do Fundeb para instituições filantrópicas e confessionais.", lulaVote: false, flavioVote: true },
+        { id: 8, title: "Escola em Tempo Integral (Lei 14.640/2023)", desc: "Fomentar financeiramente a ampliação da jornada escolar para 7 horas diárias na rede pública.", lulaVote: true, flavioVote: false },
+        { id: 9, title: "Royalties do Petróleo Vinculados à Educação", desc: "Preservar a destinação obrigatória de 75% dos royalties do petróleo e do Fundo Social ao ensino público.", lulaVote: true, flavioVote: false },
+        { id: 10, title: "Sistema de Vouchers para Escolas Particulares", desc: "Financiar matrículas de alunos de baixa renda em colégios privados em substituição a novos prédios públicos.", lulaVote: false, flavioVote: true }
       ],
-      // 1: Saúde
-      [
-        [11, "Dispensa de Revalida Provisória", "Permitir formados no exterior em áreas prioritárias sem revalidação imediata do diploma.", true, false],
-        [12, "Licença Compulsória em Emergências", "Quebra temporária facilitada de patentes de fármacos durante crises sanitárias.", true, false],
-        [13, "Exigência de Vacinação Infantil", "Manter vacinação básica obrigatória como critério para apoios sociais e matrículas.", true, false],
-        [14, "Fornecimento de Canabidiol pelo SUS", "Autorizar medicamentos derivados de cannabis para tratamentos neurológicos na rede pública.", true, false],
-        [15, "Gestão Hospitalar por Organizações Sociais", "Transferir a gestão de hospitais públicos para fundações e entidades privadas.", false, true],
-        [16, "Vedação de Rescisão de Planos de Saúde", "Proibir operadoras privadas de cancelar unilateralmente planos de pacientes crónicos e idosos.", true, false],
-        [17, "Piso da Saúde Livre de Teto Fiscal", "Proibir travas orçamentárias que limitem os repasses federais mínimos para a saúde pública.", true, false],
-        [18, "Telessaúde Sem Consulta Presencial Prévia", "Autorizar consultas e prescrições médicas à distância em todo o território nacional.", true, true],
-        [19, "Dedução Total de Saúde no Imposto de Renda", "Manter a possibilidade de dedução integral dos custos de hospitais privados na declaração.", false, true],
-        [20, "Gratuidade Integral no Farmácia Popular", "Financiamento público total de medicamentos para asma e hipertensão em farmácias conveniadas.", true, false]
+      Saude: [
+        { id: 11, title: "Dispensa de Revalida no Mais Médicos (Lei 14.621/2023)", desc: "Permitir médicos formados no exterior atuando em municípios remotos por até 4 anos sem prova prévia.", lulaVote: true, flavioVote: false },
+        { id: 12, title: "Licença Compulsória de Patentes em Emergências", desc: "Facilitar quebra temporária de patentes de medicamentos e vacinas durante emergências sanitárias.", lulaVote: true, flavioVote: false },
+        { id: 13, title: "Vacinação Infantil Obrigatória no Calendário Nacional", desc: "Condicionar matrículas escolares e benefícios sociais à imunização completa das crianças.", lulaVote: true, flavioVote: false },
+        { id: 14, title: "Distribuição de Canabidiol pelo SUS (PL 399/2015)", desc: "Autorizar a dispensação pública de produtos à base de cannabis para tratamento neurológico e dores.", lulaVote: true, flavioVote: false },
+        { id: 15, title: "Gestão Hospitalar por Organizações Sociais Privadas", desc: "Repassar a administração de hospitais e unidades de saúde estatais para entidades privadas e OSs.", lulaVote: false, flavioVote: true },
+        { id: 16, title: "Proibição de Cancelamento Unilateral de Planos", desc: "Impedir operadoras privadas de rescindir apólices coletivas de idosos ou pacientes crônicos e autistas.", lulaVote: true, flavioVote: false },
+        { id: 17, title: "Piso da Saúde Isento de Teto de Despesas", desc: "Proibir que regras fiscais limitem os investimentos mínimos federais no Sistema Único de Saúde.", lulaVote: true, flavioVote: false },
+        { id: 18, title: "Regulamentação Permanente da Telessaúde (Lei 14.510/2022)", desc: "Liberar teleconsultas e prescrições médicas à distância sem exigência de consulta presencial anterior.", lulaVote: true, flavioVote: true },
+        { id: 19, title: "Dedução Total de Despesas Médicas no Imposto de Renda", desc: "Manter a possibilidade de abater 100% dos gastos com médicos particulares na declaração do IRPF.", lulaVote: false, flavioVote: true },
+        { id: 20, title: "Gratuidade Universal no Farmácia Popular", desc: "Custear 100% de remédios para asma, diabetes e hipertensão na rede privada credenciada.", lulaVote: true, flavioVote: false }
       ],
-      // 2: Segurança
-      [
-        [21, "Extinção de Saídas Temporárias", "Acabar com o benefício de saída de reclusos em regime semiaberto em feriados.", false, true],
-        [22, "Facilitação de Armas e Munições para CACs", "Permitir transporte com munição pronta para uso a atiradores desportivos registados.", false, true],
-        [23, "Maioridade Penal aos 16 Anos", "Permitir aplicação de regime prisional comum para maiores de 16 anos em crimes hediondos.", false, true],
-        [24, "Câmaras em Uniformes Policiais", "Condicionar fundos de segurança federais à utilização de câmaras nas fardas policiais.", true, false],
-        [25, "Invasão Rural como Crime Hediondo", "Tipificar ocupações e invasões de terra com pena inafiançável e prisão em flagrante.", false, true],
-        [26, "Vedação de Soltura para Reincidentes", "Impedir liberdade provisória em audiência de custódia para reincidentes em roubo e tráfico.", false, true],
-        [27, "Implementação do Juiz das Garantias", "Criar juiz específico para a instrução, proibindo-o de julgar o mérito da ação penal.", true, true],
-        [28, "Descriminalização de Pequenas Quantidades", "Definir porte individual de canábis (até 40g) sem sanções de natureza penal.", true, false],
-        [29, "Pena Prisional Contínua de até 40 Anos", "Manter a ampliação do tempo máximo de cumprimento ininterrupto de reclusão.", false, true],
-        [30, "Limitações a Incursões Armadas", "Restringir operações ostensivas armadas em áreas escolares e hospitalares em serviço.", true, false]
+      Seguranca: [
+        { id: 21, title: "Extinção de Saídas Temporárias (Lei 14.843/2024)", desc: "Acabar com as saídas temporárias de presos do regime semiaberto em feriados e datas comemorativas.", lulaVote: false, flavioVote: true },
+        { id: 22, title: "Porte e Facilitação de Armas para CACs", desc: "Permitir transporte de arma com munição pronta para uso a atiradores desportivos registrados.", lulaVote: false, flavioVote: true },
+        { id: 23, title: "Redução da Maioridade Penal para 16 Anos", desc: "Aplicar o Código Penal de adultos a menores de 16 e 17 anos em crimes hediondos e homicídio doloso.", lulaVote: false, flavioVote: true },
+        { id: 24, title: "Câmeras Corporais nas Fardas Policiais", desc: "Condicionar o repasse do Fundo Nacional de Segurança Pública ao uso de câmeras nos agentes.", lulaVote: true, flavioVote: false },
+        { id: 25, title: "Invasão de Terras Rurais como Crime Hediondo", desc: "Tipificar ocupações e invasões no campo como crime inafiançável com prisão em flagrante.", lulaVote: false, flavioVote: true },
+        { id: 26, title: "Proibição de Liberdade Provisória para Reincidentes", desc: "Impedir soltura em audiência de custódia para detidos que já possuam antecedentes por roubo e tráfico.", lulaVote: false, flavioVote: true },
+        { id: 27, title: "Criação do Juiz das Garantias", desc: "Instituir magistrado específico para fiscalizar o inquérito, impedindo-o de atuar na sentença.", lulaVote: true, flavioVote: true },
+        { id: 28, title: "Descriminalização de Pequenas Quantidades de Drogas", desc: "Tratar porte de até 40g de maconha como ato administrativo sem aplicação de prisão.", lulaVote: true, flavioVote: false },
+        { id: 29, title: "Aumento do Limite de Pena Prisional para 40 Anos", desc: "Manter o tempo limite de cumprimento contínuo de pena privativa de liberdade ampliado para 40 anos.", lulaVote: false, flavioVote: true },
+        { id: 30, title: "Restrições a Operações Policiais Perto de Escolas", desc: "Limitar incursões armadas durante horários escolares e próximo de unidades de atendimento de saúde.", lulaVote: true, flavioVote: false }
       ],
-      // 3: Economia
-      [
-        [31, "Autonomia do Banco Central", "Fixar mandatos não coincidentes para a direção do Banco Central definir taxas de juro.", false, true],
-        [32, "Privatização de Grandes Estatais", "Alienação de participações governamentais em companhias de geração elétrica e infraestrutura.", false, true],
-        [33, "Tributação sobre Fundos Exclusivos", "Cobrança periódica de tributos sobre carteiras e contas internacionais de alta renda.", true, false],
-        [34, "Regime do Arcabouço Fiscal", "Permitir expansão de despesas federais atreladas ao comportamento da receita arrecadada.", true, false],
-        [35, "Reforma Tributária com IVA Dual", "Unificar tributos sobre consumo com alíquota nula para alimentos de cesta básica.", true, false],
-        [36, "Paridade Internacional de Preços da Petrobras", "Determinar que combustíveis nacionais sigam estritamente as cotações em dólares.", false, true],
-        [37, "Novo Marco de Saneamento Básico", "Obrigatoriedade de concorrência com operadores privados em concessões de saneamento.", false, true],
-        [38, "Regulação e Taxação de Apostas Virtuais", "Cobrança de alíquota sobre faturamento de sites de apostas desportivas online.", true, true],
-        [39, "Crédito Subsidiado por Bancos Públicos", "Disponibilizar juros mais baixos pelo banco de fomento para a indústria selecionada.", true, false],
-        [40, "Desestatização dos Correios", "Abrir a totalidade do serviço postal nacional à livre iniciativa privada.", false, true]
+      Economia: [
+        { id: 31, title: "Autonomia do Banco Central (LC 179/2021)", desc: "Fixar mandatos estáveis para os diretores do BC para definir juros sem interferência do Executivo.", lulaVote: false, flavioVote: true },
+        { id: 32, title: "Desestatização de Grandes Empresas (Eletrobras)", desc: "Transferir o controle de estatais de energia e infraestrutura ao mercado privado.", lulaVote: false, flavioVote: true },
+        { id: 33, title: "Tributação de Offshores e Fundos Exclusivos (Lei 14.754/2023)", desc: "Cobrar imposto de renda periódico sobre rendimentos de patrimônios de alta renda no país e no exterior.", lulaVote: true, flavioVote: false },
+        { id: 34, title: "Regime do Arcabouço Fiscal (LC 200/2023)", desc: "Atrelar o crescimento dos gastos públicos ao aumento real da arrecadação com limite de até 2,5%.", lulaVote: true, flavioVote: false },
+        { id: 35, title: "Reforma Tributária sobre o Consumo (EC 132/2023)", desc: "Unificar cinco tributos num IVA Dual e isentar itens essenciais da cesta básica de alimentos.", lulaVote: true, flavioVote: false },
+        { id: 36, title: "Paridade Internacional de Combustíveis (PPI)", desc: "Determinar que o combustível refinado internamente seja precificado pelo dólar e pelo barril global.", lulaVote: false, flavioVote: true },
+        { id: 37, title: "Marco Legal do Saneamento Básico (Lei 14.026/2020)", desc: "Obrigar a abertura de concorrência com a iniciativa privada nos serviços de água e esgotos.", lulaVote: false, flavioVote: true },
+        { id: 38, title: "Tributação e Regulação de Apostas Digitais (Bets)", desc: "Cobrar 12% sobre a receita bruta de plataformas digitais de apostas esportivas online.", lulaVote: true, flavioVote: true },
+        { id: 39, title: "Crédito Subsidiado via BNDES para a Indústria", desc: "Utilizar fundos públicos com taxas de juros mais baixas para financiar empresas estratégicas.", lulaVote: true, flavioVote: false },
+        { id: 40, title: "Privatização dos Serviços Postais (Correios)", desc: "Alienação do controle dos Correios para operadores logísticos privados.", lulaVote: false, flavioVote: true }
       ],
-      // 4: Emprego
-      [
-        [41, "Prevalência do Acordo sobre a Lei Trabalhista", "Conceder validade soberana a acordos diretos entre empregado e empresa sobre normas gerais.", false, true],
-        [42, "Regulamentação de Aplicações de Transporte", "Definir valor mínimo por hora rodada e inscrição obrigatória na previdência pública.", true, false],
-        [43, "Manutenção da Desoneração da Folha", "Permitir cálculo de tributos sobre a faturação em vez da folha de pagamento de setores-chave.", false, true],
-        [44, "Contribuição Assistencial Sindical", "Autorizar cobrança aprovada em assembleias de trabalhadores, ressalvada recusa expressa.", true, false],
-        [45, "Trabalho ao Domingo sem Acordo Coletivo", "Permitir funcionamento do comércio aos domingos sem exigência de autorização do sindicato.", false, true],
-        [46, "Terceirização Ampla em Atividades-Fim", "Autorizar a contratação de colaboradores terceirizados para as funções essenciais.", false, true],
-        [47, "Aumento Real Obrigatório do Salário Mínimo", "Reajuste do piso legal combinando o índice da inflação ao crescimento real do PIB.", true, false],
-        [48, "Contrato de Trabalho Intermitente", "Manter a possibilidade de contratação remunerada estritamente pelas horas convocadas.", false, true],
-        [49, "Dispensa de Cota de Aprendizes em Pequenas Empresas", "Desobrigar microempresas de acolher proporções fixas de menores aprendizes.", false, true],
-        [50, "Carência Maior para Seguro-Desemprego", "Exigir mais meses de trabalho consecutivo para a concessão do subsídio de desemprego.", false, true]
+      Emprego: [
+        { id: 41, title: "Prevalência do Acordo Individual sobre a CLT", desc: "Reconhecer que o contrato individual direto entre empregado e patrão tem primazia sobre a lei geral.", lulaVote: false, flavioVote: true },
+        { id: 42, title: "Regulação do Trabalho por Aplicativo (PLP 12/2024)", desc: "Garantir valor horário mínimo e contribuição para a previdência a motoristas de plataformas.", lulaVote: true, flavioVote: false },
+        { id: 43, title: "Prorrogação da Desoneração da Folha Salarial", desc: "Permitir a cobrança sobre a receita bruta em vez de tributar a folha de pagamento de empresas.", lulaVote: false, flavioVote: true },
+        { id: 44, title: "Contribuição Assistencial para Sindicatos", desc: "Permitir a cobrança aprovada em assembleia geral de trabalhadores, ressalvada recusa por escrito.", lulaVote: true, flavioVote: false },
+        { id: 45, title: "Trabalho aos Domingos sem Acordo Coletivo", desc: "Liberar a abertura do comércio aos domingos sem necessidade de negociação com sindicatos.", lulaVote: false, flavioVote: true },
+        { id: 46, title: "Terceirização Ampla em Atividades-Fim", desc: "Autorizar a contratação de mão de obra terceirizada para as funções centrais da empresa.", lulaVote: false, flavioVote: true },
+        { id: 47, title: "Política de Aumento Real do Salário Mínimo", desc: "Corrigir o piso nacional anualmente pela inflação mais o crescimento do PIB apurado.", lulaVote: true, flavioVote: false },
+        { id: 48, title: "Contrato de Trabalho Intermitente", desc: "Manter a possibilidade de contratar colaboradores pagos estritamente pelas horas convocadas.", lulaVote: false, flavioVote: true },
+        { id: 49, title: "Flexibilização de Cotas para Jovens Aprendizes", desc: "Dispensar micro e pequenas empresas de exigências de contratação de menores aprendizes.", lulaVote: false, flavioVote: true },
+        { id: 50, title: "Endurecimento de Regras do Seguro-Desemprego", desc: "Aumentar os meses mínimos de trabalho consecutivo para solicitar o benefício de desemprego.", lulaVote: false, flavioVote: true }
       ]
-    ];
+    };
 
-    var temaAtivo = -1;
-    var indiceQuestao = 0;
-    var votosUsuario = {};
+    var areaTitles = { Educacao: "Educação", Saude: "Saúde", Seguranca: "Segurança Pública", Economia: "Economia & Tributos", Emprego: "Emprego & Trabalho" };
+    var selectedTheme = null;
+    var currentList = [];
+    var qIndex = 0;
+    var answers = {};
 
-    function escolherTema(idx, elem) {
-      temaAtivo = idx;
-      var btns = document.getElementsByClassName("opt-btn");
-      for (var i = 0; i < btns.length; i++) {
-        btns[i].className = "opt-btn";
-        var mark = btns[i].getElementsByClassName("m")[0];
-        if (mark) mark.innerText = "";
+    function selectTheme(key, btnElem) {
+      selectedTheme = key;
+      var buttons = document.querySelectorAll('.theme-btn');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+        var chk = buttons[i].querySelector('.chk');
+        if (chk) chk.innerText = '';
       }
-      elem.className = "opt-btn sel";
-      var m = elem.getElementsByClassName("m")[0];
-      if (m) m.innerText = "✓";
-      
-      document.getElementById("btnAvancar").innerText = "Iniciar Simulação (" + temas[idx] + ")";
+      btnElem.classList.add('active');
+      var thisChk = btnElem.querySelector('.chk');
+      if (thisChk) thisChk.innerText = '✓';
+
+      var startBtn = document.getElementById('btnStartQuiz');
+      startBtn.innerText = 'Iniciar Simulação (' + areaTitles[key] + ')';
     }
 
-    function iniciar() {
-      if (temaAtivo === -1) {
-        alert("Toque numa das opções acima para selecionar a sua prioridade.");
+    function startQuiz() {
+      if (!selectedTheme) {
+        alert("Toque primeiro numa das 5 opções de tema para selecionar.");
         return;
       }
-      indiceQuestao = 0;
-      votosUsuario = {};
-      
-      document.getElementById("scr1").style.display = "none";
-      document.getElementById("scr2").style.display = "block";
-      document.getElementById("txtArea").innerText = temas[temaAtivo];
-      mostrarQuestao();
+      currentList = database[selectedTheme];
+      qIndex = 0;
+      answers = {};
+
+      document.getElementById('viewStart').style.display = 'none';
+      document.getElementById('viewQuiz').style.display = 'block';
+      document.getElementById('lblArea').innerText = areaTitles[selectedTheme];
+      renderCard();
     }
 
-    function mostrarQuestao() {
-      var q = dados[temaAtivo][indiceQuestao];
-      document.getElementById("txtPasso").innerText = (indiceQuestao + 1) + " de 10";
-      document.getElementById("txtNum").innerText = "PROPOSIÇÃO LEGISLATIVA #" + (indiceQuestao + 1);
-      document.getElementById("txtTitulo").innerText = q[1];
-      document.getElementById("txtDesc").innerText = q[2];
-      
-      var meuVoto = votosUsuario[q[0]];
-      var bS = document.getElementById("bSim");
-      var bN = document.getElementById("bNao");
-      
-      bS.className = "btn-v" + (meuVoto === true ? " v-sim" : "");
-      bN.className = "btn-v" + (meuVoto === false ? " v-nao" : "");
-      
-      document.getElementById("bVoltar").style.visibility = (indiceQuestao === 0) ? "hidden" : "visible";
-      document.getElementById("bConf").innerText = (indiceQuestao === 9) ? "Ver Resultado" : "Avançar";
+    function renderCard() {
+      var q = currentList[qIndex];
+      document.getElementById('lblStep').innerText = "Questão " + (qIndex + 1) + " de 10";
+      document.getElementById('lblTag').innerText = "PROPOSIÇÃO LEGISLATIVA #" + (qIndex + 1);
+      document.getElementById('lblTitle').innerText = q.title;
+      document.getElementById('lblDesc').innerText = q.desc;
+
+      var pct = Math.round(((qIndex + 1) / 10) * 100);
+      document.getElementById('fillBar').style.width = pct + "%";
+
+      var val = answers[q.id];
+      var btnS = document.getElementById('btnSim');
+      var btnN = document.getElementById('btnNao');
+
+      btnS.className = "vote-btn vote-sim" + (val === true ? " active" : "");
+      btnN.className = "vote-btn vote-nao" + (val === false ? " active" : "");
+
+      document.getElementById('btnBack').style.visibility = (qIndex === 0) ? "hidden" : "visible";
+      document.getElementById('btnNext').innerText = (qIndex === 9) ? "Ver Resultado" : "Confirmar";
     }
 
-    function votar(val) {
-      var q = dados[temaAtivo][indiceQuestao];
-      votosUsuario[q[0]] = val;
-      mostrarQuestao();
+    function vote(boolVal) {
+      answers[currentList[qIndex].id] = boolVal;
+      renderCard();
     }
 
-    function avancarQuestao() {
-      var q = dados[temaAtivo][indiceQuestao];
-      if (votosUsuario[q[0]] === undefined) {
-        alert("Por favor, selecione SIM ou NÃO antes de avançar.");
+    function goNext() {
+      var q = currentList[qIndex];
+      if (answers[q.id] === undefined) {
+        alert("Vote SIM ou NÃO antes de avançar.");
         return;
       }
-      if (indiceQuestao < 9) {
-        indiceQuestao++;
-        mostrarQuestao();
+      if (qIndex < 9) {
+        qIndex++;
+        renderCard();
       } else {
-        concluir();
+        showResults();
       }
     }
 
-    function voltar() {
-      if (indiceQuestao > 0) {
-        indiceQuestao--;
-        mostrarQuestao();
+    function goBack() {
+      if (qIndex > 0) {
+        qIndex--;
+        renderCard();
       }
     }
 
-    function concluir() {
-      document.getElementById("scr2").style.display = "none";
-      document.getElementById("scr3").style.display = "block";
-      
-      var pontuacaoLula = 0;
-      var pontuacaoFlavio = 0;
-      var lista = document.getElementById("listaAuditoria");
-      lista.innerHTML = "";
-      
-      var itens = dados[temaAtivo];
-      for (var i = 0; i < itens.length; i++) {
-        var item = itens[i];
-        var id = item[0];
-        var tit = item[1];
-        var vL = item[3];
-        var vF = item[4];
-        var meu = votosUsuario[id];
-        
-        if (meu === vL) pontuacaoLula++;
-        if (meu === vF) pontuacaoFlavio++;
-        
-        var d = document.createElement("div");
-        d.className = "hist-item";
-        d.innerHTML = "<strong>" + tit + "</strong><br>" +
-          "O seu voto: <span style='font-weight:bold; color:" + (meu ? "#166534" : "#991b1b") + ";'>" + (meu ? "SIM" : "NÃO") + "</span><br>" +
-          "<span style='color:#64748b; font-size:11px;'>• Lula (PT): " + (vL ? "SIM" : "NÃO") + " | • Flávio (PL): " + (vF ? "SIM" : "NÃO") + "</span>";
-        lista.appendChild(d);
+    function showResults() {
+      document.getElementById('viewQuiz').style.display = 'none';
+      document.getElementById('viewResult').style.display = 'block';
+
+      var countL = 0;
+      var countF = 0;
+      var audit = document.getElementById('auditList');
+      audit.innerHTML = '';
+
+      for (var i = 0; i < currentList.length; i++) {
+        var q = currentList[i];
+        var ans = answers[q.id];
+        if (ans === q.lulaVote) countL++;
+        if (ans === q.flavioVote) countF++;
+
+        var item = document.createElement('div');
+        item.className = 'audit-item';
+        item.innerHTML = 
+          "<div class='audit-header'>" +
+            "<span>" + q.title + "</span>" +
+            "<span style='color:" + (ans ? "#166534" : "#991b1b") + "; font-weight:700;'>Seu Voto: " + (ans ? "SIM" : "NÃO") + "</span>" +
+          "</div>" +
+          "<div class='audit-details'>" +
+            "• <strong>Lula (PT):</strong> Atuou/Votou " + (q.lulaVote ? "SIM" : "NÃO") + "<br>" +
+            "• <strong>Flávio Bolsonaro (PL):</strong> Atuou/Votou " + (q.flavioVote ? "SIM" : "NÃO") +
+          "</div>";
+        audit.appendChild(item);
       }
-      
-      var pL = Math.round((pontuacaoLula / 10) * 100);
-      var pF = Math.round((pontuacaoFlavio / 10) * 100);
-      
-      document.getElementById("resL").innerText = pL + "%";
-      document.getElementById("totL").innerText = pontuacaoLula + " de 10 alinhamentos";
-      document.getElementById("resF").innerText = pF + "%";
-      document.getElementById("totF").innerText = pontuacaoFlavio + " de 10 alinhamentos";
+
+      var pctL = Math.round((countL / 10) * 100);
+      var pctF = Math.round((countF / 10) * 100);
+
+      document.getElementById('valLula').innerText = pctL + "%";
+      document.getElementById('countLula').innerText = countL + " de 10 alinhamentos";
+      document.getElementById('valFlavio').innerText = pctF + "%";
+      document.getElementById('countFlavio').innerText = countF + " de 10 alinhamentos";
     }
 
-    function reiniciar() {
-      temaAtivo = -1;
-      var btns = document.getElementsByClassName("opt-btn");
-      for (var i = 0; i < btns.length; i++) {
-        btns[i].className = "opt-btn";
-        var mark = btns[i].getElementsByClassName("m")[0];
-        if (mark) mark.innerText = "";
+    function restart() {
+      selectedTheme = null;
+      var buttons = document.querySelectorAll('.theme-btn');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+        var chk = buttons[i].querySelector('.chk');
+        if (chk) chk.innerText = '';
       }
-      document.getElementById("btnAvancar").innerText = "Escolha um tema acima";
-      document.getElementById("scr3").style.display = "none";
-      document.getElementById("scr1").style.display = "block";
+      document.getElementById('btnStartQuiz').innerText = 'Selecione um tema acima';
+      document.getElementById('viewResult').style.display = 'none';
+      document.getElementById('viewStart').style.display = 'block';
     }
 
-    function copiar() {
-      var txt = "Resultado no Simulador Eleitoral (Segundo Turno):\n" +
-        "• Lula (PT): " + document.getElementById("resL").innerText + "\n" +
-        "• Flávio Bolsonaro (PL): " + document.getElementById("resF").innerText + "\n" +
-        "Baseado em 10 votações reais em " + temas[temaAtivo] + ".";
-      
+    function shareResults() {
+      var l = document.getElementById('valLula').innerText;
+      var f = document.getElementById('valFlavio').innerText;
+      var t = "Resultado do Simulador Eleitoral (Segundo Turno):\n• Lula (PT): " + l + "\n• Flávio Bolsonaro (PL): " + f + "\nBaseado em 10 votações reais em " + areaTitles[selectedTheme] + ".";
+
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(txt).then(function() {
+        navigator.clipboard.writeText(t).then(function() {
           alert("Resumo copiado com sucesso!");
         }).catch(function() {
-          prompt("Copie o resultado:", txt);
+          prompt("Copie o texto abaixo:", t);
         });
       } else {
-        prompt("Copie o resultado:", txt);
+        prompt("Copie o texto abaixo:", t);
       }
     }
   </script>
