@@ -3,23 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Simulador Parlamentar 2026</title>
+  <title>Simulador Eleitoral 2026</title>
+  <script>
+    // Remove o parâmetro ?fbclid= do Instagram imediatamente para evitar travamentos de cache
+    if (window.location.search.indexOf('fbclid=') !== -1) {
+      try {
+        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      } catch (e) {}
+    }
+  </script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
-    .card { background: #ffffff; width: 100%; max-width: 540px; border-radius: 18px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+    .card { background: #ffffff; width: 100%; max-width: 520px; border-radius: 18px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
     h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; text-align: center; }
-    h2 { font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
     p.sub { font-size: 13px; color: #475569; line-height: 1.45; margin-bottom: 16px; }
 
     /* Lista de Temas */
     .theme-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-    .theme-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
-    .theme-btn.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
+    .theme-item { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; user-select: none; }
+    .theme-item.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
 
     /* Botão Principal */
-    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; }
+    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; user-select: none; text-decoration: none; }
     .btn-main:active { background: #172554; }
 
     /* Barra de Progresso */
@@ -33,7 +42,7 @@
 
     /* Votos Sim / Não */
     .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; }
+    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; user-select: none; }
     .vote-sim { background: #f0fdf4; border-color: #86efac; color: #166534; }
     .vote-sim.active { background: #22c55e; border-color: #22c55e; color: #ffffff; }
     .vote-nao { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
@@ -56,7 +65,7 @@
     .audit-header { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 4px; }
     .audit-details { font-size: 11px; color: #475569; background: #f8fafc; padding: 6px; border-radius: 6px; margin-top: 4px; }
 
-    .btn-sec { background: #ffffff; border: 1px solid #cbd5e1; color: #1e3a8a; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+    .btn-sec { background: #ffffff; border: 1px solid #cbd5e1; color: #1e3a8a; width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; text-align: center; }
   </style>
 </head>
 <body>
@@ -67,29 +76,29 @@
     <p class="sub" style="text-align: center; margin-bottom: 18px;">Eleições 2026 • Segundo Turno</p>
 
     <h2>Escolha a sua Prioridade</h2>
-    <p class="sub">Toque numa das 5 áreas para simular o seu voto em 10 projetos reais do Congresso e comparar com os atos de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
+    <p class="sub">Toque em uma das 5 áreas para simular o seu voto em 10 projetos reais do Congresso e comparar com os atos de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
 
     <div class="theme-list">
-      <button type="button" class="theme-btn" onclick="chooseTheme('Educacao')">
-        <span>📚 Educação</span><span id="mark-Educacao"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="chooseTheme('Saude')">
-        <span>🩺 Saúde</span><span id="mark-Saude"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="chooseTheme('Seguranca')">
-        <span>🛡️ Segurança Pública</span><span id="mark-Seguranca"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="chooseTheme('Economia')">
-        <span>📈 Economia & Tributos</span><span id="mark-Economia"></span>
-      </button>
-      <button type="button" class="theme-btn" onclick="chooseTheme('Emprego')">
-        <span>💼 Emprego & Trabalho</span><span id="mark-Emprego"></span>
-      </button>
+      <div class="theme-item" onclick="pickArea('Educacao', this)" ontouchstart="pickArea('Educacao', this)">
+        <span>📚 Educação</span><span class="chk-mark"></span>
+      </div>
+      <div class="theme-item" onclick="pickArea('Saude', this)" ontouchstart="pickArea('Saude', this)">
+        <span>🩺 Saúde</span><span class="chk-mark"></span>
+      </div>
+      <div class="theme-item" onclick="pickArea('Seguranca', this)" ontouchstart="pickArea('Seguranca', this)">
+        <span>🛡️ Segurança Pública</span><span class="chk-mark"></span>
+      </div>
+      <div class="theme-item" onclick="pickArea('Economia', this)" ontouchstart="pickArea('Economia', this)">
+        <span>📈 Economia & Tributos</span><span class="chk-mark"></span>
+      </div>
+      <div class="theme-item" onclick="pickArea('Emprego', this)" ontouchstart="pickArea('Emprego', this)">
+        <span>💼 Emprego & Trabalho</span><span class="chk-mark"></span>
+      </div>
     </div>
 
-    <button type="button" class="btn-main" onclick="startVoting()">
+    <div class="btn-main" onclick="goToQuiz()" ontouchstart="goToQuiz()">
       Iniciar Simulação
-    </button>
+    </div>
   </div>
 
   <!-- ECRÃ 2: Votação -->
@@ -106,96 +115,6 @@
     <div class="q-title" id="lblTitle">Título do Projeto</div>
     <div class="q-box" id="lblDesc">Descrição clara do projeto legislativo...</div>
 
-    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como votaria nesta matéria?</div>
+    <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como você votaria nesta matéria?</div>
     <div class="vote-grid">
-      <button type="button" id="btnSim" class="vote-btn vote-sim" onclick="castVote(true)">SIM (Aprovar)</button>
-      <button type="button" id="btnNao" class="vote-btn vote-nao" onclick="castVote(false)">NÃO (Rejeitar)</button>
-    </div>
-
-    <div class="nav-row">
-      <button type="button" id="btnBack" class="btn-prev" onclick="stepBack()">← Anterior</button>
-      <button type="button" id="btnNext" class="btn-main" style="width: auto; padding: 10px 22px; font-size: 13px;" onclick="stepNext()">Confirmar</button>
-    </div>
-  </div>
-
-  <!-- ECRÃ 3: Resultados -->
-  <div id="viewResult" class="card" style="display: none; text-align: center;">
-    <h2>Resultado da Afinidade</h2>
-    <p class="sub">Confronto direto com os atos e votos dos candidatos:</p>
-
-    <div class="res-grid">
-      <div class="res-card" style="border-top: 4px solid #ef4444;">
-        <div class="res-name" style="color: #b91c1c;">Lula (PT)</div>
-        <div id="valLula" class="res-val" style="color: #ef4444;">0%</div>
-        <div class="res-sub" id="countLula">0 de 10 alinhamentos</div>
-      </div>
-      <div class="res-card" style="border-top: 4px solid #3b82f6;">
-        <div class="res-name" style="color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
-        <div id="valFlavio" class="res-val" style="color: #3b82f6;">0%</div>
-        <div class="res-sub" id="countFlavio">0 de 10 alinhamentos</div>
-      </div>
-    </div>
-
-    <div style="font-size: 12px; font-weight: 700; color: #334155; text-align: left; margin-bottom: 6px;">Auditoria de Voto por Voto:</div>
-    <div id="auditList" class="audit-box"></div>
-
-    <button type="button" class="btn-main" onclick="shareResult()">Copiar Resumo</button>
-    <button type="button" class="btn-sec" onclick="restartQuiz()">Escolher Outra Área</button>
-  </div>
-
-  <script>
-    const database = {
-      Educacao: [
-        { id: 1, title: "Reformulação do Ensino Médio (Lei 14.945/2024)", desc: "Fixar 2.400 horas obrigatórias para a formação geral básica, reduzindo a carga optativa dos itinerários.", lulaVote: true, flavioVote: false },
-        { id: 2, title: "Programa Pé-de-Meia (Lei 14.818/2024)", desc: "Instituir poupança financeira e bolsa mensal paga pela União a alunos de escolas públicas para reduzir a evasão.", lulaVote: true, flavioVote: false },
-        { id: 3, title: "Educação Domiciliar / Homeschooling (PL 3.179/2012)", desc: "Permitir formalmente o ensino em casa sob a tutela dos pais com avaliações periódicas do Estado.", lulaVote: false, flavioVote: true },
-        { id: 4, title: "Programa de Escolas Cívico-Militares", desc: "Manter verba federal para o modelo compartilhado de gestão disciplinar com forças de segurança pública.", lulaVote: false, flavioVote: true },
-        { id: 5, title: "Atualização da Lei de Cotas (Lei 14.723/2023)", desc: "Prorrogar o sistema de cotas federais com teto socioeconómico reduzido para 1 salário mínimo per capita.", lulaVote: true, flavioVote: false },
-        { id: 6, title: "Cobrança de Mensalidade em Pós-Graduação Pública", desc: "Autorizar universidades federais a cobrarem cursos de especialização (lato sensu) para captar recursos.", lulaVote: false, flavioVote: true },
-        { id: 7, title: "Repasses do Fundeb a Escolas Privadas Conveniadas", desc: "Permitir o direcionamento de recursos públicos do Fundeb para instituições filantrópicas e confessionais.", lulaVote: false, flavioVote: true },
-        { id: 8, title: "Escola em Tempo Integral (Lei 14.640/2023)", desc: "Fomentar financeiramente a ampliação da jornada escolar para 7 horas diárias na rede pública.", lulaVote: true, flavioVote: false },
-        { id: 9, title: "Royalties do Petróleo Vinculados à Educação", desc: "Preservar a destinação obrigatória de 75% dos royalties do petróleo e do Fundo Social ao ensino público.", lulaVote: true, flavioVote: false },
-        { id: 10, title: "Sistema de Vouchers para Escolas Particulares", desc: "Financiar matrículas de alunos de baixa renda em colégios privados em substituição a novos prédios públicos.", lulaVote: false, flavioVote: true }
-      ],
-      Saude: [
-        { id: 11, title: "Dispensa de Revalida no Mais Médicos (Lei 14.621/2023)", desc: "Permitir médicos formados no estrangeiro atuando em municípios remotos por até 4 anos sem prova prévia.", lulaVote: true, flavioVote: false },
-        { id: 12, title: "Licença Compulsória de Patentes em Emergências", desc: "Facilitar quebra temporária de patentes de medicamentos e vacinas durante emergências sanitárias.", lulaVote: true, flavioVote: false },
-        { id: 13, title: "Vacinação Infantil Obrigatória no Calendário Nacional", desc: "Condicionar matrículas escolares e benefícios sociais à imunização completa das crianças.", lulaVote: true, flavioVote: false },
-        { id: 14, title: "Distribuição de Canabidiol pelo SUS (PL 399/2015)", desc: "Autorizar a dispensação pública de produtos à base de cannabis para tratamento neurológico e dores.", lulaVote: true, flavioVote: false },
-        { id: 15, title: "Gestão Hospitalar por Organizações Sociais Privadas", desc: "Repassar a administração de hospitais e unidades de saúde estatais para entidades privadas e OSs.", lulaVote: false, flavioVote: true },
-        { id: 16, title: "Proibição de Cancelamento Unilateral de Planos", desc: "Impedir operadoras privadas de rescindir apólices coletivas de idosos ou pacientes crónicos e autistas.", lulaVote: true, flavioVote: false },
-        { id: 17, title: "Piso da Saúde Isento de Teto de Despesas", desc: "Proibir que regras fiscais limitem os investimentos mínimos federais no Sistema Único de Saúde.", lulaVote: true, flavioVote: false },
-        { id: 18, title: "Regulamentação Permanente da Telessaúde (Lei 14.510/2022)", desc: "Liberar teleconsultas e prescrições médicas à distância sem exigência de consulta presencial anterior.", lulaVote: true, flavioVote: true },
-        { id: 19, title: "Dedução Total de Despesas Médicas no Imposto de Renda", desc: "Manter a possibilidade de abater 100% dos gastos com médicos particulares na declaração do IRPF.", lulaVote: false, flavioVote: true },
-        { id: 20, title: "Gratuidade Universal no Farmácia Popular", desc: "Custear 100% de remédios para asma, diabetes e hipertensão na rede privada credenciada.", lulaVote: true, flavioVote: false }
-      ],
-      Seguranca: [
-        { id: 21, title: "Extinção de Saídas Temporárias (Lei 14.843/2024)", desc: "Acabar com as saídas temporárias de presos do regime semiaberto em feriados e datas comemorativas.", lulaVote: false, flavioVote: true },
-        { id: 22, title: "Porte e Facilitação de Armas para CACs", desc: "Permitir transporte de arma com munição pronta para uso a atiradores desportivos registrados.", lulaVote: false, flavioVote: true },
-        { id: 23, title: "Redução da Maioridade Penal para 16 Anos", desc: "Aplicar o Código Penal de adultos a menores de 16 e 17 anos em crimes hediondos e homicídio doloso.", lulaVote: false, flavioVote: true },
-        { id: 24, title: "Câmaras Corporais nas Fardas Policiais", desc: "Condicionar o repasse do Fundo Nacional de Segurança Pública ao uso de câmaras nos agentes.", lulaVote: true, flavioVote: false },
-        { id: 25, title: "Invasão de Terras Rurais como Crime Hediondo", desc: "Tipificar ocupações e invasões no campo como crime inafiançável com prisão em flagrante.", lulaVote: false, flavioVote: true },
-        { id: 26, title: "Proibição de Liberdade Provisória para Reincidentes", desc: "Impedir soltura em audiência de custódia para detidos que já possuam antecedentes por roubo e tráfico.", lulaVote: false, flavioVote: true },
-        { id: 27, title: "Criação do Juiz das Garantias", desc: "Instituir magistrado específico para fiscalizar o inquérito, impedindo-o de atuar na sentença.", lulaVote: true, flavioVote: true },
-        { id: 28, title: "Descriminalização de Pequenas Quantidades de Drogas", desc: "Tratar porte de até 40g de canábis como ato administrativo sem aplicação de prisão.", lulaVote: true, flavioVote: false },
-        { id: 29, title: "Aumento do Limite de Pena Prisional para 40 Anos", desc: "Manter o tempo limite de cumprimento contínuo de pena privativa de liberdade ampliado para 40 anos.", lulaVote: false, flavioVote: true },
-        { id: 30, title: "Restrições a Operações Policiais Perto de Escolas", desc: "Limitar incursões armadas durante horários escolares e próximo de unidades de atendimento de saúde.", lulaVote: true, flavioVote: false }
-      ],
-      Economia: [
-        { id: 31, title: "Autonomia do Banco Central (LC 179/2021)", desc: "Fixar mandatos estáveis para os diretores do BC para definir juros sem interferência do Executivo.", lulaVote: false, flavioVote: true },
-        { id: 32, title: "Desestatização de Grandes Empresas (Eletrobras)", desc: "Transferir o controlo de estatais de energia e infraestrutura ao mercado privado.", lulaVote: false, flavioVote: true },
-        { id: 33, title: "Tributação de Offshores e Fundos Exclusivos (Lei 14.754/2023)", desc: "Cobrar imposto de renda periódico sobre rendimentos de patrimónios de alta renda no país e no exterior.", lulaVote: true, flavioVote: false },
-        { id: 34, title: "Regime do Arcabouço Fiscal (LC 200/2023)", desc: "Atrelar o crescimento dos gastos públicos ao aumento real da arrecadação com limite de até 2,5%.", lulaVote: true, flavioVote: false },
-        { id: 35, title: "Reforma Tributária sobre o Consumo (EC 132/2023)", desc: "Unificar cinco tributos num IVA Dual e isentar itens essenciais da cesta básica de alimentos.", lulaVote: true, flavioVote: false },
-        { id: 36, title: "Paridade Internacional de Combustíveis (PPI)", desc: "Determinar que o combustível refinado internamente seja precificado pelo dólar e pelo barril global.", lulaVote: false, flavioVote: true },
-        { id: 37, title: "Marco Legal do Saneamento Básico (Lei 14.026/2020)", desc: "Obrigar a abertura de concorrência com a iniciativa privada nos serviços de água e esgotos.", lulaVote: false, flavioVote: true },
-        { id: 38, title: "Tributação e Regulação de Apostas Digitais (Bets)", desc: "Cobrar 12% sobre a receita bruta de plataformas digitais de apostas desportivas online.", lulaVote: true, flavioVote: true },
-        { id: 39, title: "Crédito Subsidiado via BNDES para a Indústria", desc: "Utilizar fundos públicos com taxas de juro mais baixas para financiar empresas estratégicas.", lulaVote: true, flavioVote: false },
-        { id: 40, title: "Privatização dos Serviços Postais (Correios)", desc: "Alienação do controlo dos Correios para operadores logísticos privados.", lulaVote: false, flavioVote: true }
-      ],
-      Emprego: [
-        { id: 41, title: "Prevalência do Acordo Individual sobre a CLT", desc: "Reconhecer que o contrato individual direto entre empregado e patrão tem primazia sobre a lei geral.", lulaVote: false, flavioVote: true },
-        { id: 42, title: "Regulação do Trabalho por Aplicativo (PLP 12/2024)", desc: "Garantir valor horário mínimo e contribuição para a previdência a motoristas de plataformas.", lulaVote: true, flavioVote: false },
-        { id: 43, title: "Prorrogação da Desoneração da Folha Salarial", desc: "Permitir a cobrança sobre a receita bruta em vez de tributar a folha de pagamento de empresas.", lulaVote: false, flavioVote: true },
-        { id: 44, title: "Contribuição Assistencial para Sindicatos", desc: "Permitir a cobrança aprovada em assembleia geral de trabalhadores, ressalvada recusa por escrito.", lulaVote: true, flavioVote: false },
-        { id: 45, title: "Trabalho aos Domingos sem Acordo Coletivo", desc: "Liberar a abertura do comércio
+      <div id="btnSim" class="vote-btn
