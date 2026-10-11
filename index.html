@@ -97,7 +97,6 @@
   <script>
     var temas = ["Educação", "Saúde", "Segurança Pública", "Economia", "Emprego"];
     
-    // Base de dados estruturada: [id, titulo, descricao, votoLula, votoFlavio]
     var dados = [
       // 0: Educação
       [
@@ -144,5 +143,173 @@
         [32, "Privatização de Grandes Estatais", "Alienação de participações governamentais em companhias de geração elétrica e infraestrutura.", false, true],
         [33, "Tributação sobre Fundos Exclusivos", "Cobrança periódica de tributos sobre carteiras e contas internacionais de alta renda.", true, false],
         [34, "Regime do Arcabouço Fiscal", "Permitir expansão de despesas federais atreladas ao comportamento da receita arrecadada.", true, false],
+        [35, "Reforma Tributária com IVA Dual", "Unificar tributos sobre consumo com alíquota nula para alimentos de cesta básica.", true, false],
+        [36, "Paridade Internacional de Preços da Petrobras", "Determinar que combustíveis nacionais sigam estritamente as cotações em dólares.", false, true],
+        [37, "Novo Marco de Saneamento Básico", "Obrigatoriedade de concorrência com operadores privados em concessões de saneamento.", false, true],
+        [38, "Regulação e Taxação de Apostas Virtuais", "Cobrança de alíquota sobre faturamento de sites de apostas desportivas online.", true, true],
+        [39, "Crédito Subsidiado por Bancos Públicos", "Disponibilizar juros mais baixos pelo banco de fomento para a indústria selecionada.", true, false],
+        [40, "Desestatização dos Correios", "Abrir a totalidade do serviço postal nacional à livre iniciativa privada.", false, true]
+      ],
+      // 4: Emprego
+      [
+        [41, "Prevalência do Acordo sobre a Lei Trabalhista", "Conceder validade soberana a acordos diretos entre empregado e empresa sobre normas gerais.", false, true],
+        [42, "Regulamentação de Aplicações de Transporte", "Definir valor mínimo por hora rodada e inscrição obrigatória na previdência pública.", true, false],
+        [43, "Manutenção da Desoneração da Folha", "Permitir cálculo de tributos sobre a faturação em vez da folha de pagamento de setores-chave.", false, true],
+        [44, "Contribuição Assistencial Sindical", "Autorizar cobrança aprovada em assembleias de trabalhadores, ressalvada recusa expressa.", true, false],
+        [45, "Trabalho ao Domingo sem Acordo Coletivo", "Permitir funcionamento do comércio aos domingos sem exigência de autorização do sindicato.", false, true],
+        [46, "Terceirização Ampla em Atividades-Fim", "Autorizar a contratação de colaboradores terceirizados para as funções essenciais.", false, true],
+        [47, "Aumento Real Obrigatório do Salário Mínimo", "Reajuste do piso legal combinando o índice da inflação ao crescimento real do PIB.", true, false],
+        [48, "Contrato de Trabalho Intermitente", "Manter a possibilidade de contratação remunerada estritamente pelas horas convocadas.", false, true],
+        [49, "Dispensa de Cota de Aprendizes em Pequenas Empresas", "Desobrigar microempresas de acolher proporções fixas de menores aprendizes.", false, true],
+        [50, "Carência Maior para Seguro-Desemprego", "Exigir mais meses de trabalho consecutivo para a concessão do subsídio de desemprego.", false, true]
+      ]
+    ];
 
+    var temaAtivo = -1;
+    var indiceQuestao = 0;
+    var votosUsuario = {};
+
+    function escolherTema(idx, elem) {
+      temaAtivo = idx;
+      var btns = document.getElementsByClassName("opt-btn");
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].className = "opt-btn";
+        var mark = btns[i].getElementsByClassName("m")[0];
+        if (mark) mark.innerText = "";
+      }
+      elem.className = "opt-btn sel";
+      var m = elem.getElementsByClassName("m")[0];
+      if (m) m.innerText = "✓";
+      
+      document.getElementById("btnAvancar").innerText = "Iniciar Simulação (" + temas[idx] + ")";
+    }
+
+    function iniciar() {
+      if (temaAtivo === -1) {
+        alert("Toque numa das opções acima para selecionar a sua prioridade.");
+        return;
+      }
+      indiceQuestao = 0;
+      votosUsuario = {};
+      
+      document.getElementById("scr1").style.display = "none";
+      document.getElementById("scr2").style.display = "block";
+      document.getElementById("txtArea").innerText = temas[temaAtivo];
+      mostrarQuestao();
+    }
+
+    function mostrarQuestao() {
+      var q = dados[temaAtivo][indiceQuestao];
+      document.getElementById("txtPasso").innerText = (indiceQuestao + 1) + " de 10";
+      document.getElementById("txtNum").innerText = "PROPOSIÇÃO LEGISLATIVA #" + (indiceQuestao + 1);
+      document.getElementById("txtTitulo").innerText = q[1];
+      document.getElementById("txtDesc").innerText = q[2];
+      
+      var meuVoto = votosUsuario[q[0]];
+      var bS = document.getElementById("bSim");
+      var bN = document.getElementById("bNao");
+      
+      bS.className = "btn-v" + (meuVoto === true ? " v-sim" : "");
+      bN.className = "btn-v" + (meuVoto === false ? " v-nao" : "");
+      
+      document.getElementById("bVoltar").style.visibility = (indiceQuestao === 0) ? "hidden" : "visible";
+      document.getElementById("bConf").innerText = (indiceQuestao === 9) ? "Ver Resultado" : "Avançar";
+    }
+
+    function votar(val) {
+      var q = dados[temaAtivo][indiceQuestao];
+      votosUsuario[q[0]] = val;
+      mostrarQuestao();
+    }
+
+    function avancarQuestao() {
+      var q = dados[temaAtivo][indiceQuestao];
+      if (votosUsuario[q[0]] === undefined) {
+        alert("Por favor, selecione SIM ou NÃO antes de avançar.");
+        return;
+      }
+      if (indiceQuestao < 9) {
+        indiceQuestao++;
+        mostrarQuestao();
+      } else {
+        concluir();
+      }
+    }
+
+    function voltar() {
+      if (indiceQuestao > 0) {
+        indiceQuestao--;
+        mostrarQuestao();
+      }
+    }
+
+    function concluir() {
+      document.getElementById("scr2").style.display = "none";
+      document.getElementById("scr3").style.display = "block";
+      
+      var pontuacaoLula = 0;
+      var pontuacaoFlavio = 0;
+      var lista = document.getElementById("listaAuditoria");
+      lista.innerHTML = "";
+      
+      var itens = dados[temaAtivo];
+      for (var i = 0; i < itens.length; i++) {
+        var item = itens[i];
+        var id = item[0];
+        var tit = item[1];
+        var vL = item[3];
+        var vF = item[4];
+        var meu = votosUsuario[id];
         
+        if (meu === vL) pontuacaoLula++;
+        if (meu === vF) pontuacaoFlavio++;
+        
+        var d = document.createElement("div");
+        d.className = "hist-item";
+        d.innerHTML = "<strong>" + tit + "</strong><br>" +
+          "O seu voto: <span style='font-weight:bold; color:" + (meu ? "#166534" : "#991b1b") + ";'>" + (meu ? "SIM" : "NÃO") + "</span><br>" +
+          "<span style='color:#64748b; font-size:11px;'>• Lula (PT): " + (vL ? "SIM" : "NÃO") + " | • Flávio (PL): " + (vF ? "SIM" : "NÃO") + "</span>";
+        lista.appendChild(d);
+      }
+      
+      var pL = Math.round((pontuacaoLula / 10) * 100);
+      var pF = Math.round((pontuacaoFlavio / 10) * 100);
+      
+      document.getElementById("resL").innerText = pL + "%";
+      document.getElementById("totL").innerText = pontuacaoLula + " de 10 alinhamentos";
+      document.getElementById("resF").innerText = pF + "%";
+      document.getElementById("totF").innerText = pontuacaoFlavio + " de 10 alinhamentos";
+    }
+
+    function reiniciar() {
+      temaAtivo = -1;
+      var btns = document.getElementsByClassName("opt-btn");
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].className = "opt-btn";
+        var mark = btns[i].getElementsByClassName("m")[0];
+        if (mark) mark.innerText = "";
+      }
+      document.getElementById("btnAvancar").innerText = "Escolha um tema acima";
+      document.getElementById("scr3").style.display = "none";
+      document.getElementById("scr1").style.display = "block";
+    }
+
+    function copiar() {
+      var txt = "Resultado no Simulador Eleitoral (Segundo Turno):\n" +
+        "• Lula (PT): " + document.getElementById("resL").innerText + "\n" +
+        "• Flávio Bolsonaro (PL): " + document.getElementById("resF").innerText + "\n" +
+        "Baseado em 10 votações reais em " + temas[temaAtivo] + ".";
+      
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(txt).then(function() {
+          alert("Resumo copiado com sucesso!");
+        }).catch(function() {
+          prompt("Copie o resultado:", txt);
+        });
+      } else {
+        prompt("Copie o resultado:", txt);
+      }
+    }
+  </script>
+</body>
+</html>
