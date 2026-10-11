@@ -2,33 +2,24 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Simulador Eleitoral 2026</title>
-  <script>
-    // Remove o parâmetro ?fbclid= do Instagram imediatamente para evitar travamentos de cache
-    if (window.location.search.indexOf('fbclid=') !== -1) {
-      try {
-        var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-      } catch (e) {}
-    }
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Parlamentar 2026</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     
-    .card { background: #ffffff; width: 100%; max-width: 520px; border-radius: 18px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+    .card { background: #ffffff; width: 100%; max-width: 520px; border-radius: 18px; padding: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
     h1 { font-size: 18px; font-weight: 800; color: #1e3a8a; margin-bottom: 4px; text-align: center; }
     h2 { font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
     p.sub { font-size: 13px; color: #475569; line-height: 1.45; margin-bottom: 16px; }
 
     /* Lista de Temas */
     .theme-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-    .theme-item { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; user-select: none; }
-    .theme-item.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
+    .theme-btn { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 14px; text-align: left; font-size: 15px; font-weight: 700; color: #1e293b; cursor: pointer; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .theme-btn.active { border-color: #1e3a8a; background: #eff6ff; color: #1e3a8a; }
 
     /* Botão Principal */
-    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; user-select: none; text-decoration: none; }
+    .btn-main { background: #1e3a8a; color: #ffffff; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-align: center; display: block; }
     .btn-main:active { background: #172554; }
 
     /* Barra de Progresso */
@@ -42,7 +33,7 @@
 
     /* Votos Sim / Não */
     .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; user-select: none; }
+    .vote-btn { padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; text-align: center; border: 2px solid transparent; width: 100%; }
     .vote-sim { background: #f0fdf4; border-color: #86efac; color: #166534; }
     .vote-sim.active { background: #22c55e; border-color: #22c55e; color: #ffffff; }
     .vote-nao { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
@@ -52,7 +43,7 @@
     .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
     .btn-prev { background: transparent; border: none; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; padding: 8px; }
 
-    /* Ecrã de Resultados */
+    /* Resultados */
     .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
     .res-card { padding: 14px; border-radius: 12px; text-align: center; border: 1px solid #e2e8f0; background: #f8fafc; }
     .res-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
@@ -70,7 +61,7 @@
 </head>
 <body>
 
-  <!-- ECRÃ 1: Escolha do Tema -->
+  <!-- TELA 1: Escolha do Tema -->
   <div id="viewStart" class="card">
     <h1>Simulador Parlamentar</h1>
     <p class="sub" style="text-align: center; margin-bottom: 18px;">Eleições 2026 • Segundo Turno</p>
@@ -79,32 +70,32 @@
     <p class="sub">Toque em uma das 5 áreas para simular o seu voto em 10 projetos reais do Congresso e comparar com os atos de <strong>Lula (PT)</strong> e <strong>Flávio Bolsonaro (PL)</strong>.</p>
 
     <div class="theme-list">
-      <div class="theme-item" onclick="pickArea('Educacao', this)" ontouchstart="pickArea('Educacao', this)">
-        <span>📚 Educação</span><span class="chk-mark"></span>
-      </div>
-      <div class="theme-item" onclick="pickArea('Saude', this)" ontouchstart="pickArea('Saude', this)">
-        <span>🩺 Saúde</span><span class="chk-mark"></span>
-      </div>
-      <div class="theme-item" onclick="pickArea('Seguranca', this)" ontouchstart="pickArea('Seguranca', this)">
-        <span>🛡️ Segurança Pública</span><span class="chk-mark"></span>
-      </div>
-      <div class="theme-item" onclick="pickArea('Economia', this)" ontouchstart="pickArea('Economia', this)">
-        <span>📈 Economia & Tributos</span><span class="chk-mark"></span>
-      </div>
-      <div class="theme-item" onclick="pickArea('Emprego', this)" ontouchstart="pickArea('Emprego', this)">
-        <span>💼 Emprego & Trabalho</span><span class="chk-mark"></span>
-      </div>
+      <button type="button" class="theme-btn" onclick="selectTheme('Educacao', this)">
+        <span>📚 Educação</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Saude', this)">
+        <span>🩺 Saúde</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Seguranca', this)">
+        <span>🛡️ Segurança Pública</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Economia', this)">
+        <span>📈 Economia & Tributos</span><span class="chk"></span>
+      </button>
+      <button type="button" class="theme-btn" onclick="selectTheme('Emprego', this)">
+        <span>💼 Emprego & Trabalho</span><span class="chk"></span>
+      </button>
     </div>
 
-    <div class="btn-main" onclick="goToQuiz()" ontouchstart="goToQuiz()">
-      Iniciar Simulação
-    </div>
+    <button type="button" id="btnStartQuiz" class="btn-main" onclick="startQuiz()">
+      Selecione um tema acima
+    </button>
   </div>
 
-  <!-- ECRÃ 2: Votação -->
+  <!-- TELA 2: Votação -->
   <div id="viewQuiz" class="card" style="display: none;">
     <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #64748b;">
-      <span id="lblArea">Educação</span>
+      <span id="lblArea">Tema</span>
       <span id="lblStep">Questão 1 de 10</span>
     </div>
     <div class="progress-bar-bg">
@@ -113,8 +104,31 @@
 
     <div class="badge-tag" id="lblTag">PROPOSIÇÃO #1</div>
     <div class="q-title" id="lblTitle">Título do Projeto</div>
-    <div class="q-box" id="lblDesc">Descrição clara do projeto legislativo...</div>
+    <div class="q-box" id="lblDesc">Descrição do projeto...</div>
 
     <div style="font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 8px;">Como você votaria nesta matéria?</div>
     <div class="vote-grid">
-      <div id="btnSim" class="vote-btn
+      <button type="button" id="btnSim" class="vote-btn vote-sim" onclick="vote(true)">SIM (Aprovar)</button>
+      <button type="button" id="btnNao" class="vote-btn vote-nao" onclick="vote(false)">NÃO (Rejeitar)</button>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" id="btnBack" class="btn-prev" onclick="goBack()">← Anterior</button>
+      <button type="button" id="btnNext" class="btn-main" style="width: auto; padding: 10px 22px; font-size: 13px;" onclick="goNext()">Confirmar</button>
+    </div>
+  </div>
+
+  <!-- TELA 3: Resultados -->
+  <div id="viewResult" class="card" style="display: none; text-align: center;">
+    <h2>Resultado da Afinidade</h2>
+    <p class="sub">Confronto direto com os atos e votos dos candidatos:</p>
+
+    <div class="res-grid">
+      <div class="res-card" style="border-top: 4px solid #ef4444;">
+        <div class="res-name" style="color: #b91c1c;">Lula (PT)</div>
+        <div id="valLula" class="res-val" style="color: #ef4444;">0%</div>
+        <div class="res-sub" id="countLula">0 de 10 alinhamentos</div>
+      </div>
+      <div class="res-card" style="border-top: 4px solid #3b82f6;">
+        <div class="res-name" style="color: #1d4ed8;">Flávio Bolsonaro (PL)</div>
+        <div
